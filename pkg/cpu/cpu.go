@@ -17,14 +17,14 @@ type cpu struct {
 }
 
 func (c *cpu) Tick() (err error) {
-	opCode := binary.BigEndian.Uint16([]byte{c.m[c.pc], c.m[c.pc+1]})
-	//fmt.Printf("%#04x:%X:[%#02x %#02x]:%v\n", opCode, opCode, c.m[c.pc], c.m[c.pc+1], opCode)
+	opcode := binary.BigEndian.Uint16([]byte{c.m[c.pc], c.m[c.pc+1]})
+	//fmt.Printf("%#04x:%X:[%#02x %#02x]:%v\n", opcode, opcode, c.m[c.pc], c.m[c.pc+1], opcode)
 	//opCodeA := (uint16(c.m[c.pc]) << 8) | uint16(c.m[c.pc+1])
 	//fmt.Printf("%#04x:%X:[%#02x %#02x]:%v\n", opCodeA, opCodeA, c.m[c.pc], c.m[c.pc+1], opCodeA)
 
-	switch val := opCode & 0xF000; val {
+	switch val := opcode & 0xF000; val {
 	case 0x0000: // 0x00
-		switch sub := opCode & 0x000F; sub {
+		switch sub := opcode & 0x000F; sub {
 		case 0x0000:
 			// 0x00E0, Display, disp_clear(), Clears the screen.
 			log.Debugf("Clear screen")
@@ -37,17 +37,32 @@ func (c *cpu) Tick() (err error) {
 	case 0xA000:
 		// 0xANNN, MEM, I = NNN, Sets I to the address NNN.
 		log.Debugf("Opcode: 0xANNN")
-		c.ir = opCode & 0x0FFF
+		c.ir = opcode & 0x0FFF
 		c.pc += 2
 	case 0x8000: // 0x8
-		switch sub := opCode & 0x000F; sub {
+		switch sub := opcode & 0x000F; sub {
 		case 0x0004:
 			// 0x8XY4, Math, Vx += Vy , Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
 			log.Debugf("Opcode: 0x0004")
+			vy := (opcode & 0x00F0) >> 4
+			vx := (opcode & 0x0F00) >> 8
+			log.
+				WithField("vy", vy).
+				WithField("y", c.v[vy]).
+				WithField("vx", vx).
+				WithField("x", c.v[vx]).
+				Debug("Got vy vx")
+			if c.v[vy] > (0xFF - c.v[vx]) {
+				log.Debug("carrying the one")
+				c.v[0xF] = 1 // carry
+			} else {
+				c.v[0xF] = 0
+			}
+			c.v[vx] += c.v[vy]
 			c.pc += 2
 		}
 	default:
-		log.Debugf("Unknown opCode: %#04x:%X\n", val, val)
+		log.Debugf("Unknown opcode: %#04x:%X\n", val, val)
 	}
 	return err
 }
