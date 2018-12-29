@@ -60,6 +60,16 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			crry:   0x0,
 		},
 		{
+			name:   "0x8XY1",
+			opcode: 0x80e1,
+			x:      0,
+			vx:     5,
+			y:      14,
+			vy:     9,
+			exp:    13, // expect vx to become vy
+			crry:   0x0,
+		},
+		{
 			name:   "0x8XY4 Simple no carry",
 			opcode: 0x80e4,
 			x:      0,
@@ -106,6 +116,15 @@ func opCodeToBytes(opcode uint16) (result []byte) {
 	result = make([]byte, 2)
 	binary.BigEndian.PutUint16(result, opcode)
 	return result
+}
+
+func TestBitwiseOr(t *testing.T) {
+	a := uint16(5)
+	b := uint16(9)
+	fmt.Printf("%v\n", a)
+	fmt.Printf("%v\n", b)
+	or := a | b
+	fmt.Printf("%v\n", or)
 }
 
 //func Test0x8XY4(t *testing.T) {
