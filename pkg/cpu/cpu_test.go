@@ -159,6 +159,16 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			exp:    15,
 			crry:   0x0,
 		},
+		{
+			name:   "0x8XYE",
+			opcode: 0x80ee,
+			x:      0,
+			vx:     251,
+			y:      14,
+			vy:     8,
+			exp:    246,
+			crry:   0x1,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -187,31 +197,3 @@ func opCodeToBytes(opcode uint16) (result []byte) {
 	binary.BigEndian.PutUint16(result, opcode)
 	return result
 }
-
-//func Test0x8XY4(t *testing.T) {
-//	opcode := uint16(0x8fa4)
-//	fmt.Printf("%#04x:%X%v\n", opcode, opcode, opcode)
-//	m := opcode & 0x00F0 >> 4
-//	fmt.Printf("%#04x:%X:%v\n", m, m, m)
-//	ms := m >> 4
-//	fmt.Printf("%#04x:%X:%v\n", ms, ms, ms)
-//	fmt.Printf("%#04x:%X:%v\n", (opcode&0x0F00)>>8, (opcode&0x0F00)>>8, (opcode&0x0F00)>>8)
-//}
-//
-//func TestSomething(t *testing.T) {
-//	fmt.Printf("%v\n", 0xF)    // 15 	// 1111
-//	fmt.Printf("%v\n", 0xFF)   // 255 	// 11111111
-//	fmt.Printf("%v\n", 0x200)  // 512 	// 1000000000
-//	fmt.Printf("%v\n", 0x0F00) // 3840 	// 000000111100000000
-//	fmt.Printf("%v\n", 0x0FFF) // 4095 	// 000000111111111111
-//	fmt.Printf("%v\n", 0xF000) // 61440	// 1111000000000000
-//}
-
-/*
-	fmt.Printf("%v\n", 0xF000)
-	i := 0xa2f0 & 0x0FFF
-	fmt.Printf("%#04x:%X:%v\n", i, i, i)
-	fmt.Printf("%#04x:%X:%v\n", 0xA000, 0xA000, 0xF000)
-*/
-// 0x0FFF == 4095
-// 0xF000 == 61440
