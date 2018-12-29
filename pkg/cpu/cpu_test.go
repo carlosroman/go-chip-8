@@ -129,6 +129,16 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			exp:    15,
 			crry:   0x0,
 		},
+		{
+			name:   "0x8XY6",
+			opcode: 0x80e6,
+			x:      0,
+			vx:     33,
+			y:      14,
+			vy:     8,
+			exp:    16,
+			crry:   0x1,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

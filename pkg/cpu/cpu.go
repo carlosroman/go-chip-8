@@ -83,6 +83,12 @@ func (c *cpu) Tick() (err error) {
 				c.v[0xF] = 1
 			}
 			c.v[x] -= c.v[y]
+		case 0x0006:
+			// 0x8XY6, BitOp, Vx>>=1, Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
+			log.Info("Opcode: 0x8XY6")
+			x, _ := getXY(opcode, c)
+			c.v[0xF] = c.v[x] & 0x1
+			c.v[x] >>= 1
 		}
 		c.pc += 2
 	default:
