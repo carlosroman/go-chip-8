@@ -38,7 +38,7 @@ func TestCpu_Tick_0xANNN(t *testing.T) {
 	assert.Equal(t, c.ir, uint16(0x2F0))
 }
 
-func TestCpu_Tick_0x8XY4(t *testing.T) {
+func TestCpu_Tick_0x8(t *testing.T) {
 	var testCases = []struct {
 		name   string
 		opcode uint16
@@ -50,7 +50,17 @@ func TestCpu_Tick_0x8XY4(t *testing.T) {
 		crry   uint8
 	}{
 		{
-			name:   "Simple no carry",
+			name:   "0x8XY0",
+			opcode: 0x80e0,
+			x:      0,
+			vx:     12,
+			y:      14,
+			vy:     8,
+			exp:    8, // expect vx to become vy
+			crry:   0x0,
+		},
+		{
+			name:   "0x8XY4 Simple no carry",
 			opcode: 0x80e4,
 			x:      0,
 			vx:     12,
@@ -60,7 +70,7 @@ func TestCpu_Tick_0x8XY4(t *testing.T) {
 			crry:   0x0,
 		},
 		{
-			name:   "carry the one",
+			name:   "0x8XY4 carry the one",
 			opcode: 0x80e4,
 			x:      0,
 			vx:     200,
