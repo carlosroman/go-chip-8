@@ -80,7 +80,17 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			crry:   0x0,
 		},
 		{
-			name:   "0x8XY4 Simple no carry",
+			name:   "0x8XY3",
+			opcode: 0x80e3,
+			x:      0,
+			vx:     5,
+			y:      14,
+			vy:     9,
+			exp:    12, // Vx=Vx^Vy
+			crry:   0x0,
+		},
+		{
+			name:   "0x8XY4 no carry",
 			opcode: 0x80e4,
 			x:      0,
 			vx:     12,
@@ -133,7 +143,7 @@ func TestBitwiseOr(t *testing.T) {
 	b := uint16(9)
 	fmt.Printf("%v\n", a)
 	fmt.Printf("%v\n", b)
-	or := a & b
+	or := a ^ b
 	fmt.Printf("%v\n", or)
 }
 

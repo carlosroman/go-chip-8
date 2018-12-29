@@ -56,6 +56,11 @@ func (c *cpu) Tick() (err error) {
 			log.Info("Opcode: 0x8XY2")
 			x, y := getXY(opcode, c)
 			c.v[x] &= c.v[y]
+		case 0x0003:
+			// 0x8XY3, BitOp, Vx=Vx^Vy, Sets VX to VX xor VY.
+			log.Info("Opcode: 0x8XY3")
+			x, y := getXY(opcode, c)
+			c.v[x] ^= c.v[y]
 		case 0x0004:
 			// 0x8XY4, Math, Vx += Vy , Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
 			log.Info("Opcode: 0x8XY4")
