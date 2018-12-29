@@ -72,6 +72,17 @@ func (c *cpu) Tick() (err error) {
 				c.v[0xF] = 0
 			}
 			c.v[x] += c.v[y]
+		case 0x0005:
+			// 0x8XY5, Math, Vx -= Vy, VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
+			log.Info("Opcode: 0x8XY5")
+			x, y := getXY(opcode, c)
+			if c.v[y] > c.v[x] {
+				log.Debug("borrowing")
+				c.v[0xF] = 0 // borrow
+			} else {
+				c.v[0xF] = 1
+			}
+			c.v[x] -= c.v[y]
 		}
 		c.pc += 2
 	default:

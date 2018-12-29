@@ -109,6 +109,26 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			exp:    4, // rolls over, 200 + 60 = 260, 5 over so 0,1,2,3,*4*
 			crry:   0x1,
 		},
+		{
+			name:   "0x8XY5 no borrow",
+			opcode: 0x80e5,
+			x:      0,
+			vx:     12,
+			y:      14,
+			vy:     8,
+			exp:    4,
+			crry:   0x1,
+		},
+		{
+			name:   "0x8XY5 borrow",
+			opcode: 0x80e5,
+			x:      0,
+			vx:     8,
+			y:      14,
+			vy:     249,
+			exp:    15,
+			crry:   0x0,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -126,8 +146,8 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, int16(514), c.pc, "should have moved program counter on two")
 			assert.Equal(t, uint16(0x0), c.ir, "No index register to change")
-			assert.Equal(t, tc.crry, c.v[15], "No one to carry over")
-			assert.Equal(t, tc.exp, c.v[0], "X should equal Y + X")
+			assert.Equal(t, tc.crry, c.v[15], "No one to carry over or borrow")
+			assert.Equal(t, tc.exp, c.v[0], "X not equal expected")
 		})
 	}
 }
@@ -136,15 +156,6 @@ func opCodeToBytes(opcode uint16) (result []byte) {
 	result = make([]byte, 2)
 	binary.BigEndian.PutUint16(result, opcode)
 	return result
-}
-
-func TestBitwiseOr(t *testing.T) {
-	a := uint16(5)
-	b := uint16(9)
-	fmt.Printf("%v\n", a)
-	fmt.Printf("%v\n", b)
-	or := a ^ b
-	fmt.Printf("%v\n", or)
 }
 
 //func Test0x8XY4(t *testing.T) {
@@ -159,6 +170,7 @@ func TestBitwiseOr(t *testing.T) {
 //
 //func TestSomething(t *testing.T) {
 //	fmt.Printf("%v\n", 0xF)    // 15 	// 1111
+//	fmt.Printf("%v\n", 0xFF)   // 255 	// 11111111
 //	fmt.Printf("%v\n", 0x200)  // 512 	// 1000000000
 //	fmt.Printf("%v\n", 0x0F00) // 3840 	// 000000111100000000
 //	fmt.Printf("%v\n", 0x0FFF) // 4095 	// 000000111111111111
