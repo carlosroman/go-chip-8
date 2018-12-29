@@ -36,7 +36,7 @@ func loadMemoryTest(tb testing.TB) Memory {
 	m := InitMemory()
 	f, err := os.Open(C8PIC_path)
 	assert.NoError(tb, err)
-	err = m.loadMemory(f)
+	err = m.LoadMemory(f)
 	assert.NoError(tb, err)
 	return m
 }

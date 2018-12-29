@@ -8,7 +8,7 @@ import (
 
 type Memory []uint8
 
-func (m Memory) loadMemory(r io.Reader) (err error) {
+func (m Memory) LoadMemory(r io.Reader) (err error) {
 	b, err := ioutil.ReadAll(r)
 	if err != nil {
 		return err
