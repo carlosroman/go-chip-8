@@ -38,6 +38,19 @@ func TestCpu_Tick_0xANNN(t *testing.T) {
 	assert.Equal(t, c.ir, uint16(0x2F0))
 }
 
+func TestCpu_Tick_0x6XNN(t *testing.T) {
+	bs := opCodeToBytes(0x64ee)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	c := NewCPU(m)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, c.pc, int16(514))
+	assert.Equal(t, uint8(238), c.v[4])
+}
+
 func TestCpu_Tick_0x8(t *testing.T) {
 	var testCases = []struct {
 		name   string

@@ -39,6 +39,15 @@ func (c *cpu) Tick() (err error) {
 		log.Info("Opcode: 0xANNN")
 		c.ir = opcode & 0x0FFF
 		c.pc += 2
+	case 0x6000:
+		// 0x6XNN, Const, Vx = NN, Sets VX to NN.
+		log.Info("Opcode: 6XNN")
+		x := getX(opcode, c)
+		bs := make([]byte, 2)
+		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
+		log.Info(bs)
+		c.v[x] = bs[1]
+		c.pc += 2
 	case 0x8000: // 0x8
 		switch sub := opcode & 0x000F; sub {
 		case 0x0000:
@@ -112,6 +121,16 @@ func (c *cpu) Tick() (err error) {
 		log.Debugf("Unknown opcode: %#04x:%X\n", val, val)
 	}
 	return err
+}
+
+func getX(opcode uint16, c *cpu) (x uint16) {
+	x = (opcode & 0x0F00) >> 8
+	if log.IsLevelEnabled(log.DebugLevel) {
+		log.
+			WithField("x", x).
+			Debug("Got x")
+	}
+	return x
 }
 
 func getXY(opcode uint16, c *cpu) (x uint16, y uint16) {
