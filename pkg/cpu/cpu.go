@@ -52,6 +52,17 @@ func (c *cpu) Tick() (err error) {
 		log.Debugf("nnn:%v", nnn)
 		c.stack.Push(c.pc)
 		c.pc = int16(nnn)
+	case 0x3000:
+		// 0x3XNN, Cond, if(Vx==NN), Skips the next instruction if VX equals NN. (Usually the next instruction is a jump to skip a code block)
+		log.Info("Opcode: 3XNN")
+		x := getX(opcode)
+		bs := make([]byte, 2)
+		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
+		c.pc += 2
+		log.Info(bs)
+		if c.v[x] == bs[1] {
+			c.pc += 2
+		}
 	case 0x6000:
 		// 0x6XNN, Const, Vx = NN, Sets VX to NN.
 		log.Info("Opcode: 6XNN")
