@@ -45,8 +45,15 @@ func (c *cpu) Tick() (err error) {
 		x := getX(opcode, c)
 		bs := make([]byte, 2)
 		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
-		log.Info(bs)
 		c.v[x] = bs[1]
+		c.pc += 2
+	case 0x7000:
+		// 0x7XNN, Const, Vx += NN, Adds NN to VX. (Carry flag is not changed)
+		log.Info("Opcode: 7XNN")
+		x := getX(opcode, c)
+		bs := make([]byte, 2)
+		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
+		c.v[x] += bs[1]
 		c.pc += 2
 	case 0x8000: // 0x8
 		switch sub := opcode & 0x000F; sub {
