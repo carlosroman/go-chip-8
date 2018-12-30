@@ -72,6 +72,14 @@ func (c *cpu) Tick() (err error) {
 		if c.v[x] != bs[1] {
 			c.pc += 2
 		}
+	case 0x5000:
+		// 0x5XY0, Cond, if(Vx==Vy) 	Skips the next instruction if VX equals VY. (Usually the next instruction is a jump to skip a code block)
+		log.Info("Opcode: 5XY0")
+		x, y := getXY(opcode, c)
+		c.pc += 2
+		if c.v[x] == c.v[y] {
+			c.pc += 2
+		}
 	case 0x6000:
 		// 0x6XNN, Const, Vx = NN, Sets VX to NN.
 		log.Info("Opcode: 6XNN")
