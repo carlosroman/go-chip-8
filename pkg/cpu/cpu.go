@@ -59,8 +59,17 @@ func (c *cpu) Tick() (err error) {
 		bs := make([]byte, 2)
 		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
 		c.pc += 2
-		log.Info(bs)
 		if c.v[x] == bs[1] {
+			c.pc += 2
+		}
+	case 0x4000:
+		// 0x4XNN, Cond, if(Vx!=NN), Skips the next instruction if VX doesn't equal NN. (Usually the next instruction is a jump to skip a code block)
+		log.Info("Opcode: 4XNN")
+		x := getX(opcode)
+		bs := make([]byte, 2)
+		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
+		c.pc += 2
+		if c.v[x] != bs[1] {
 			c.pc += 2
 		}
 	case 0x6000:
