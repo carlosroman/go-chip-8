@@ -39,10 +39,16 @@ func (c *cpu) Tick() (err error) {
 		log.Info("Opcode: 0xANNN")
 		c.ir = opcode & 0x0FFF
 		c.pc += 2
+	case 0x1000:
+		// 0x1NNN, Flow, goto NNN;, Jumps to address NNN.
+		log.Info("Opcode: 1NNN")
+		nnn := opcode & 0x0FFF
+		log.Debugf("nnn:%v", nnn)
+		c.pc = int16(nnn)
 	case 0x6000:
 		// 0x6XNN, Const, Vx = NN, Sets VX to NN.
 		log.Info("Opcode: 6XNN")
-		x := getX(opcode, c)
+		x := getX(opcode)
 		bs := make([]byte, 2)
 		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
 		c.v[x] = bs[1]
@@ -50,7 +56,7 @@ func (c *cpu) Tick() (err error) {
 	case 0x7000:
 		// 0x7XNN, Const, Vx += NN, Adds NN to VX. (Carry flag is not changed)
 		log.Info("Opcode: 7XNN")
-		x := getX(opcode, c)
+		x := getX(opcode)
 		bs := make([]byte, 2)
 		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
 		c.v[x] += bs[1]
@@ -130,7 +136,7 @@ func (c *cpu) Tick() (err error) {
 	return err
 }
 
-func getX(opcode uint16, c *cpu) (x uint16) {
+func getX(opcode uint16) (x uint16) {
 	x = (opcode & 0x0F00) >> 8
 	if log.IsLevelEnabled(log.DebugLevel) {
 		log.

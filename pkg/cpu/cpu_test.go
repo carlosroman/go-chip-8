@@ -34,8 +34,20 @@ func TestCpu_Tick_0xANNN(t *testing.T) {
 	c := NewCPU(m)
 	err = c.Tick()
 	assert.NoError(t, err)
-	assert.Equal(t, c.pc, int16(514))
+	assert.Equal(t, int16(514), c.pc)
 	assert.Equal(t, c.ir, uint16(0x2F0))
+}
+
+func TestCpu_Tick_0x1NNN(t *testing.T) {
+	bs := opCodeToBytes(0x14ef)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	c := NewCPU(m)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(1263), c.pc)
 }
 
 func TestCpu_Tick_0x6XNN(t *testing.T) {
@@ -47,7 +59,7 @@ func TestCpu_Tick_0x6XNN(t *testing.T) {
 	c := NewCPU(m)
 	err = c.Tick()
 	assert.NoError(t, err)
-	assert.Equal(t, c.pc, int16(514))
+	assert.Equal(t, int16(514), c.pc)
 	assert.Equal(t, uint8(238), c.v[4])
 }
 
@@ -61,7 +73,7 @@ func TestCpu_Tick_0x7XNN(t *testing.T) {
 	c.v[4] = uint8(0x0b) // 11
 	err = c.Tick()
 	assert.NoError(t, err)
-	assert.Equal(t, c.pc, int16(514))
+	assert.Equal(t, int16(514), c.pc)
 	assert.Equal(t, uint8(0x2a), c.v[4])
 }
 
