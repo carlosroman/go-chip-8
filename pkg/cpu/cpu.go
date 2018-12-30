@@ -45,6 +45,13 @@ func (c *cpu) Tick() (err error) {
 		nnn := opcode & 0x0FFF
 		log.Debugf("nnn:%v", nnn)
 		c.pc = int16(nnn)
+	case 0x2000:
+		// 0x2NNN, Flow, *(0xNNN)(), Calls subroutine at NNN.
+		log.Info("Opcode: 2NNN")
+		nnn := opcode & 0x0FFF
+		log.Debugf("nnn:%v", nnn)
+		c.stack.Push(c.pc)
+		c.pc = int16(nnn)
 	case 0x6000:
 		// 0x6XNN, Const, Vx = NN, Sets VX to NN.
 		log.Info("Opcode: 6XNN")

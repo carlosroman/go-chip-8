@@ -50,6 +50,20 @@ func TestCpu_Tick_0x1NNN(t *testing.T) {
 	assert.Equal(t, int16(1263), c.pc)
 }
 
+func TestCpu_Tick_0x2NNN(t *testing.T) {
+	bs := opCodeToBytes(0x24ef)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	c := NewCPU(m)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(1263), c.pc)
+	assert.Equal(t, int8(1), c.stack.Len())
+	assert.Equal(t, int16(512), c.stack.Pop())
+}
+
 func TestCpu_Tick_0x6XNN(t *testing.T) {
 	bs := opCodeToBytes(0x64ee)
 	m := state.InitMemory()
@@ -86,7 +100,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 		y      int
 		vy     uint8
 		exp    uint8
-		crry   uint8
+		cry    uint8
 	}{
 		{
 			name:   "0x8XY0",
@@ -96,7 +110,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     8,
 			exp:    8, // expect vx to become vy
-			crry:   0x0,
+			cry:    0x0,
 		},
 		{
 			name:   "0x8XY1",
@@ -106,7 +120,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     9,
 			exp:    13, // Vx=Vx|Vy
-			crry:   0x0,
+			cry:    0x0,
 		},
 		{
 			name:   "0x8XY2",
@@ -116,7 +130,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     9,
 			exp:    1, // Vx=Vx&Vy
-			crry:   0x0,
+			cry:    0x0,
 		},
 		{
 			name:   "0x8XY3",
@@ -126,7 +140,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     9,
 			exp:    12, // Vx=Vx^Vy
-			crry:   0x0,
+			cry:    0x0,
 		},
 		{
 			name:   "0x8XY4 no carry",
@@ -136,7 +150,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     8,
 			exp:    20,
-			crry:   0x0,
+			cry:    0x0,
 		},
 		{
 			name:   "0x8XY4 carry the one",
@@ -146,7 +160,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     60,
 			exp:    4, // rolls over, 200 + 60 = 260, 5 over so 0,1,2,3,*4*
-			crry:   0x1,
+			cry:    0x1,
 		},
 		{
 			name:   "0x8XY5 no borrow",
@@ -156,7 +170,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     8,
 			exp:    4,
-			crry:   0x1,
+			cry:    0x1,
 		},
 		{
 			name:   "0x8XY5 borrow",
@@ -166,7 +180,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     249,
 			exp:    15,
-			crry:   0x0,
+			cry:    0x0,
 		},
 		{
 			name:   "0x8XY6",
@@ -176,7 +190,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     8,
 			exp:    16,
-			crry:   0x1,
+			cry:    0x1,
 		},
 		{
 			name:   "0x8XY7 no borrow",
@@ -186,7 +200,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     12,
 			exp:    4,
-			crry:   0x1,
+			cry:    0x1,
 		},
 		{
 			name:   "0x8XY7 borrow",
@@ -196,7 +210,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     8,
 			exp:    15,
-			crry:   0x0,
+			cry:    0x0,
 		},
 		{
 			name:   "0x8XYE",
@@ -206,7 +220,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			y:      14,
 			vy:     8,
 			exp:    246,
-			crry:   0x1,
+			cry:    0x1,
 		},
 	}
 	for _, tc := range testCases {
@@ -225,7 +239,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, int16(514), c.pc, "should have moved program counter on two")
 			assert.Equal(t, uint16(0x0), c.ir, "No index register to change")
-			assert.Equal(t, tc.crry, c.v[15], "No one to carry over or borrow")
+			assert.Equal(t, tc.cry, c.v[15], "No one to carry over or borrow")
 			assert.Equal(t, tc.exp, c.v[0], "X not equal expected")
 		})
 	}

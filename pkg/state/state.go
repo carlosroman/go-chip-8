@@ -44,6 +44,12 @@ func (s *Stack) Push(val int16) {
 	s.s[s.i] = val
 }
 
+func (s *Stack) Len() (length int8) {
+	s.l.Lock()
+	defer s.l.Unlock()
+	return s.i + 1
+}
+
 func InitStack() *Stack {
 	return &Stack{
 		s: make([]int16, 16),
