@@ -2,7 +2,6 @@ package cpu
 
 import (
 	"encoding/binary"
-	"fmt"
 	"github.com/carlosroman/go-chip-8/pkg/state"
 	log "github.com/sirupsen/logrus"
 )
@@ -24,15 +23,16 @@ func (c *cpu) Tick() (err error) {
 
 	switch val := opcode & 0xF000; val {
 	case 0x0000: // 0x00
-		switch sub := opcode & 0x000F; sub {
+		switch sub := opcode & 0x00FF; sub {
 		case 0x0000:
 			// 0x00E0, Display, disp_clear(), Clears the screen.
 			log.Debug("Clear screen")
 		case 0x00EE:
 			// 0x00EE, Flow, return;, Returns from a subroutine.
-			log.Debug("Return from a subroutine")
+			log.Info("Opcode: 00EE")
+			c.pc = c.stack.Pop()
 		default:
-			fmt.Printf("Unknown opcode [0x0000]: %#04x:%X\n", val, val)
+			log.Warnf("Unknown opcode [0x0000]: %#04x:%#04x\n", val, sub)
 		}
 	case 0xA000:
 		// 0xANNN, MEM, I = NNN, Sets I to the address NNN.

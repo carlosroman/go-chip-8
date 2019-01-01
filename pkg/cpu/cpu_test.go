@@ -25,6 +25,20 @@ func TestNewCPU(t *testing.T) {
 	assert.Equal(t, m, c.m)
 }
 
+func TestCpu_Tick_0x00EE(t *testing.T) {
+	bs := opCodeToBytes(0x00EE)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	c := NewCPU(m)
+	exp := int16(122)
+	c.stack.Push(exp)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, exp, c.pc)
+}
+
 func TestCpu_Tick_0xANNN(t *testing.T) {
 	bs := opCodeToBytes(0xa2F0)
 	m := state.InitMemory()
@@ -35,7 +49,7 @@ func TestCpu_Tick_0xANNN(t *testing.T) {
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
-	assert.Equal(t, c.ir, uint16(0x2F0))
+	assert.Equal(t, uint16(0x2F0), c.ir)
 }
 
 func TestCpu_Tick_0x1NNN(t *testing.T) {
