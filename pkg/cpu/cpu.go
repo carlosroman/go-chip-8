@@ -4,6 +4,7 @@ import (
 	"encoding/binary"
 	"github.com/carlosroman/go-chip-8/pkg/state"
 	log "github.com/sirupsen/logrus"
+	"math/rand"
 )
 
 type cpu struct {
@@ -13,6 +14,7 @@ type cpu struct {
 	sp    int16        // Stack pointer
 	stack *state.Stack // Stack
 	v     []byte       // CPU registers
+	r     *rand.Rand   // Random number generator
 }
 
 func (c *cpu) Tick() (err error) {
@@ -44,6 +46,16 @@ func (c *cpu) Tick() (err error) {
 		log.Info("Opcode: 0xBNNN")
 		nnn := opcode & 0x0FFF
 		c.pc = int16(c.v[0]) + int16(nnn)
+	case 0xC000:
+		// 0xCXNN, Rand, Vx=rand()&NN, Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.
+		log.Info("Opcode: 0xCXNN")
+		r := c.r.Intn(256)
+		x := getX(opcode)
+		bs := make([]byte, 2)
+		binary.BigEndian.PutUint16(bs, opcode&0x00FF)
+		nn := bs[1]
+		c.v[x] = byte(r) & nn
+		c.pc += 2
 	case 0x1000:
 		// 0x1NNN, Flow, goto NNN;, Jumps to address NNN.
 		log.Info("Opcode: 1NNN")
@@ -208,11 +220,12 @@ func getXY(opcode uint16, c *cpu) (x uint16, y uint16) {
 	return x, y
 }
 
-func NewCPU(memory state.Memory) *cpu {
+func NewCPU(memory state.Memory, rgen *rand.Rand) *cpu {
 	return &cpu{
 		m:     memory,
 		pc:    0x200,            // Program counter starts at 0x200 (512)
 		v:     make([]byte, 16), // The Chip 8 has 15 8-bit general purpose registers and the 16th register is used  for the ‘carry flag’.
 		stack: state.InitStack(),
+		r:     rgen,
 	}
 }
