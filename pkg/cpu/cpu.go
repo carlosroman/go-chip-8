@@ -39,6 +39,11 @@ func (c *cpu) Tick() (err error) {
 		log.Info("Opcode: 0xANNN")
 		c.ir = opcode & 0x0FFF
 		c.pc += 2
+	case 0xB000:
+		// 0xBNNN, Flow, PC=V0+NNN , Jumps to the address NNN plus V0.
+		log.Info("Opcode: 0xBNNN")
+		nnn := opcode & 0x0FFF
+		c.pc = int16(c.v[0]) + int16(nnn)
 	case 0x1000:
 		// 0x1NNN, Flow, goto NNN;, Jumps to address NNN.
 		log.Info("Opcode: 1NNN")
