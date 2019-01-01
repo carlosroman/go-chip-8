@@ -165,6 +165,14 @@ func (c *cpu) Tick() (err error) {
 			c.v[x] <<= 1
 		}
 		c.pc += 2
+	case 0x9000:
+		// 0x9XY0, Cond, if(Vx!=Vy), Skips the next instruction if VX doesn't equal VY. (Usually the next instruction is a jump to skip a code block)
+		log.Info("Opcode: 9XY0")
+		x, y := getXY(opcode, c)
+		c.pc += 2
+		if c.v[x] != c.v[y] {
+			c.pc += 2
+		}
 	default:
 		log.Debugf("Unknown opcode: %#04x:%X\n", val, val)
 	}

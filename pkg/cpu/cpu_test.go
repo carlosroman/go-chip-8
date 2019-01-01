@@ -202,6 +202,52 @@ func TestCpu_Tick_0x5XY0(t *testing.T) {
 	}
 }
 
+func TestCpu_Tick_0x9XY0(t *testing.T) {
+	var testCases = []struct {
+		name   string
+		opcode uint16
+		x      int
+		vx     uint8
+		y      int
+		vy     uint8
+		expPc  int16
+	}{
+		{
+			name:   "0x9XY0 skip",
+			opcode: 0x91e0,
+			x:      1,
+			vx:     12, // 0x0c
+			y:      14,
+			vy:     14, // 0x0e
+			expPc:  516,
+		},
+		{
+			name:   "0x9XY0 no skip",
+			opcode: 0x91e0,
+			x:      1,
+			vx:     45, // 0x2d
+			y:      14,
+			vy:     45, // 0x2d,
+			expPc:  514,
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			bs := opCodeToBytes(tc.opcode)
+			m := state.InitMemory()
+			bf := bytes.NewBuffer(bs)
+			err := m.LoadMemory(bf)
+			assert.NoError(t, err)
+			c := NewCPU(m)
+			c.v[tc.x] = tc.vx
+			c.v[tc.y] = tc.vy
+			err = c.Tick()
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expPc, c.pc)
+		})
+	}
+}
+
 func TestCpu_Tick_0x6XNN(t *testing.T) {
 	bs := opCodeToBytes(0x64ee)
 	m := state.InitMemory()
