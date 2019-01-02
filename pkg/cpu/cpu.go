@@ -192,10 +192,21 @@ func (c *cpu) Tick() (err error) {
 			c.pc += 2
 		}
 	case 0xF000:
-		// 0xFX1E, MEM, I +=Vx 	Adds VX to I.
-		log.Info("Opcode: FX1E")
-		x := getX(opcode)
-		c.ir += uint16(c.v[x])
+
+		switch sub := opcode & 0x00FF; sub {
+		case 0x001E:
+			// 0xFX1E, MEM, I +=Vx 	Adds VX to I.
+			log.Info("Opcode: FX1E")
+			x := getX(opcode)
+			c.ir += uint16(c.v[x])
+		case 0x0029:
+			// 0xFX29, MEM, I=sprite_addr[Vx], Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.
+			log.Info("Opcode: FX29")
+			x := getX(opcode)
+			c.ir = uint16(c.v[x] * 0x5)
+		default:
+			log.Warnf("Unknown opcode [0xF000]: %#04x:%#04x\n", val, sub)
+		}
 		c.pc += 2
 	default:
 		log.Debugf("Unknown opcode: %#04x:%X\n", val, val)

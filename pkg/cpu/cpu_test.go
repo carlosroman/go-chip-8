@@ -456,19 +456,48 @@ func TestCpu_Tick_0x8(t *testing.T) {
 	}
 }
 
-func TestCpu_Tick_0xFX1E(t *testing.T) {
-	bs := opCodeToBytes(0xfa1e)
-	m := state.InitMemory()
-	bf := bytes.NewBuffer(bs)
-	err := m.LoadMemory(bf)
-	assert.NoError(t, err)
-	c := getNewCPU(m)
-	c.v[10] = uint8(12)
-	c.ir = uint16(121)
-	err = c.Tick()
-	assert.NoError(t, err)
-	assert.Equal(t, int16(514), c.pc)
-	assert.Equal(t, uint16(12+121), c.ir)
+func TestCpu_Tick_0xFX_MEM(t *testing.T) {
+	var testCases = []struct {
+		name   string
+		opcode uint16
+		x      int
+		vx     uint8
+		ir     uint16
+		expIr  uint16
+	}{
+		{
+			name:   "FX1E",
+			opcode: 0xfa1e,
+			x:      10,
+			vx:     12, // 0x0c
+			ir:     121,
+			expIr:  12 + 121,
+		},
+		{
+			name:   "FX29",
+			opcode: 0xfb29,
+			x:      11,
+			vx:     12, // 0x0c
+			ir:     121,
+			expIr:  12 * 5, // 0x0c * 0X5 (font starts hex x 5)
+		},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			bs := opCodeToBytes(tc.opcode)
+			m := state.InitMemory()
+			bf := bytes.NewBuffer(bs)
+			err := m.LoadMemory(bf)
+			assert.NoError(t, err)
+			c := getNewCPU(m)
+			c.ir = tc.ir
+			c.v[tc.x] = tc.vx
+			err = c.Tick()
+			assert.NoError(t, err)
+			assert.Equal(t, int16(514), c.pc)
+			assert.Equal(t, tc.expIr, c.ir)
+		})
+	}
 }
 
 func getNewCPU(m state.Memory) *cpu {
