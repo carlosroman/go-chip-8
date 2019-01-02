@@ -26,7 +26,8 @@ func (c *cpu) Tick() (err error) {
 	switch val := opcode & 0xF000; val {
 	case 0x0000: // 0x00
 		switch sub := opcode & 0x00FF; sub {
-		case 0x0000:
+		case 0x00E0:
+			log.Info("Opcode: 00E0")
 			// 0x00E0, Display, disp_clear(), Clears the screen.
 			log.Debug("Clear screen")
 		case 0x00EE:
