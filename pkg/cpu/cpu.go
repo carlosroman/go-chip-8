@@ -192,7 +192,6 @@ func (c *cpu) Tick() (err error) {
 			c.pc += 2
 		}
 	case 0xF000:
-
 		switch sub := opcode & 0x00FF; sub {
 		case 0x001E:
 			// 0xFX1E, MEM, I +=Vx 	Adds VX to I.
@@ -204,6 +203,15 @@ func (c *cpu) Tick() (err error) {
 			log.Info("Opcode: FX29")
 			x := getX(opcode)
 			c.ir = uint16(c.v[x] * 0x5)
+		case 0x55:
+			// 0xFX55, MEM, reg_dump(Vx,&I), Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+			log.Info("Opcode: FX55")
+			x := getX(opcode)
+			for i := uint16(0); i <= x; i++ {
+				c.m[c.ir+i] = c.v[i]
+			}
+			c.ir += x + 1
+			log.Infof("c.ir=%v", c.ir)
 		default:
 			log.Warnf("Unknown opcode [0xF000]: %#04x:%#04x\n", val, sub)
 		}

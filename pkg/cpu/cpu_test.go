@@ -456,6 +456,29 @@ func TestCpu_Tick_0x8(t *testing.T) {
 	}
 }
 
+func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
+	bs := opCodeToBytes(0xf955)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	c := getNewCPU(m)
+	for i := range c.v {
+		c.v[i] = byte(i)
+	}
+	c.ir = uint16(222)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	assert.Equal(t, uint16(9+222+1), c.ir)
+
+	for i := 0; i < 10; i++ {
+		log.WithField("m[x]", 222+i).WithField("vi", c.v[i]).Debug("checking memory")
+		assert.Equal(t, c.v[i], m[222+i])
+	}
+	assert.Equal(t, uint8(0x0), m[c.ir]) // check current pointer to ir blank
+}
+
 func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 	var testCases = []struct {
 		name   string
