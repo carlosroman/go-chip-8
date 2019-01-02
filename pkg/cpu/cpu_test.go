@@ -456,6 +456,21 @@ func TestCpu_Tick_0x8(t *testing.T) {
 	}
 }
 
+func TestCpu_Tick_0xFX1E(t *testing.T) {
+	bs := opCodeToBytes(0xfa1e)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	c := getNewCPU(m)
+	c.v[10] = uint8(12)
+	c.ir = uint16(121)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	assert.Equal(t, uint16(12+121), c.ir)
+}
+
 func getNewCPU(m state.Memory) *cpu {
 	s := rand.NewSource(42)
 	r := rand.New(s)

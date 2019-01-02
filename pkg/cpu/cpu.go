@@ -191,6 +191,12 @@ func (c *cpu) Tick() (err error) {
 		if c.v[x] != c.v[y] {
 			c.pc += 2
 		}
+	case 0xF000:
+		// 0xFX1E, MEM, I +=Vx 	Adds VX to I.
+		log.Info("Opcode: FX1E")
+		x := getX(opcode)
+		c.ir += uint16(c.v[x])
+		c.pc += 2
 	default:
 		log.Debugf("Unknown opcode: %#04x:%X\n", val, val)
 	}
