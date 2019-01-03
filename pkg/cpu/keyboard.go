@@ -2,15 +2,21 @@ package cpu
 
 import "sync"
 
+type Keyboard interface {
+	waitForKeyPressed() (key byte)
+	isKeyPressed(key byte) bool
+	keyPressed(key byte)
+}
+
 type keyboard struct {
 	loc  sync.RWMutex
 	kp   byte
-	wait chan bool
+	wait chan byte
 }
 
-func newKeyboard() *keyboard {
+func newKeyboard() Keyboard {
 	return &keyboard{
-		wait: make(chan bool, 1),
+		wait: make(chan byte, 1),
 	}
 }
 
@@ -20,13 +26,14 @@ func (k *keyboard) isKeyPressed(key byte) bool {
 	return k.kp == key
 }
 
-func (k *keyboard) waitForKeyPressed() {
-	<-k.wait
+func (k *keyboard) waitForKeyPressed() (key byte) {
+	key = <-k.wait
+	return key
 }
 
 func (k *keyboard) keyPressed(key byte) {
 	k.loc.Lock()
 	defer k.loc.Unlock()
 	k.kp = key
-	k.wait <- true
+	k.wait <- key
 }

@@ -26,7 +26,8 @@ func TestKeyboard_waitForKeyPressed(t *testing.T) {
 	}()
 	wg.Done()
 	log.Info("waiting for key")
-	k.waitForKeyPressed()
+	key := k.waitForKeyPressed()
 	log.Info("checking key")
 	assert.True(t, k.isKeyPressed(0xb))
+	assert.Equal(t, byte(0xb), key)
 }

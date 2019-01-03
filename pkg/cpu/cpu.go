@@ -16,6 +16,7 @@ type cpu struct {
 	stack *state.Stack // Stack
 	v     []byte       // CPU registers
 	r     *rand.Rand   // Random number generator
+	k     Keyboard     // Keyboard wrapper
 }
 
 func (c *cpu) Tick() (err error) {
@@ -194,6 +195,12 @@ func (c *cpu) Tick() (err error) {
 		}
 	case 0xF000:
 		switch sub := opcode & 0x00FF; sub {
+		case 0x000a:
+			// 0xFX0A, KeyOp, Vx = get_key(), A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event)
+			log.Info("Opcode: FX0A")
+			key := c.k.waitForKeyPressed()
+			x := getX(opcode)
+			c.v[x] = key
 		case 0x001E:
 			// 0xFX1E, MEM, I +=Vx 	Adds VX to I.
 			log.Info("Opcode: FX1E")
@@ -265,12 +272,13 @@ func getXY(opcode uint16, c *cpu) (x uint16, y uint16) {
 	return x, y
 }
 
-func NewCPU(memory state.Memory, rgen *rand.Rand) *cpu {
+func NewCPU(memory state.Memory, rgen *rand.Rand, k Keyboard) *cpu {
 	return &cpu{
 		m:     memory,
 		pc:    0x200,            // Program counter starts at 0x200 (512)
 		v:     make([]byte, 16), // The Chip 8 has 15 8-bit general purpose registers and the 16th register is used  for the ‘carry flag’.
 		stack: state.InitStack(),
 		r:     rgen,
+		k:     k,
 	}
 }

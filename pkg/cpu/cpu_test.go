@@ -7,8 +7,10 @@ import (
 	"github.com/carlosroman/go-chip-8/pkg/state"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"math/rand"
 	"testing"
+	"time"
 )
 
 func init() {
@@ -21,7 +23,7 @@ func TestNewCPU(t *testing.T) {
 	fmt.Println(bf.Len())
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	assert.NotNil(t, c)
 	assert.Equal(t, m, c.m)
 }
@@ -32,7 +34,7 @@ func TestCpu_Tick_0x00EE(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	exp := int16(122)
 	c.stack.Push(exp)
 	err = c.Tick()
@@ -46,7 +48,7 @@ func TestCpu_Tick_0xANNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -59,7 +61,7 @@ func TestCpu_Tick_0xBNNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	c.v[0] = uint8(5)
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -72,7 +74,7 @@ func TestCpu_Tick_0xCXN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -85,7 +87,7 @@ func TestCpu_Tick_0x1NNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(1263), c.pc)
@@ -97,7 +99,7 @@ func TestCpu_Tick_0x2NNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(1263), c.pc)
@@ -135,7 +137,7 @@ func TestCpu_Tick_0x3XNN(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m)
+			c := getNewCPU(m, newKeyboard())
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
 			assert.NoError(t, err)
@@ -174,7 +176,7 @@ func TestCpu_Tick_0x4XNN(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m)
+			c := getNewCPU(m, newKeyboard())
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
 			assert.NoError(t, err)
@@ -219,7 +221,7 @@ func TestCpu_Tick_0x5XY0(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m)
+			c := getNewCPU(m, newKeyboard())
 			c.v[tc.x] = tc.vx
 			c.v[tc.y] = tc.vy
 			err = c.Tick()
@@ -265,7 +267,7 @@ func TestCpu_Tick_0x9XY0(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m)
+			c := getNewCPU(m, newKeyboard())
 			c.v[tc.x] = tc.vx
 			c.v[tc.y] = tc.vy
 			err = c.Tick()
@@ -281,7 +283,7 @@ func TestCpu_Tick_0x6XNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -294,7 +296,7 @@ func TestCpu_Tick_0x7XNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	c.v[4] = uint8(0x0b) // 11
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -441,7 +443,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m)
+			c := getNewCPU(m, newKeyboard())
 			// add a value for Y
 			c.v[tc.y] = tc.vy
 			// add a value for X
@@ -456,13 +458,29 @@ func TestCpu_Tick_0x8(t *testing.T) {
 	}
 }
 
+func TestCpu_Tick_0xFX0A(t *testing.T) {
+	bs := opCodeToBytes(0xf90a)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	k := &keyboardMock{}
+	k.On("waitForKeyPressed").WaitUntil(time.After(time.Second)).Return(byte(0xb))
+	c := getNewCPU(m, k)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	k.AssertCalled(t, "waitForKeyPressed")
+	assert.Equal(t, byte(0xb), c.v[9])
+}
+
 func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
 	bs := opCodeToBytes(0xf955)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	for i := range c.v {
 		c.v[i] = byte(i)
 	}
@@ -485,7 +503,7 @@ func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	c.ir = uint16(222)
 	for i := range c.v {
 		c.v[i] = byte(i)
@@ -503,7 +521,7 @@ func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
 		assert.Equal(t, c.v[i], byte(0x0af))
 	}
 
-	for i := 10; i < len(c.v); i++ { // check other Vs still ahve old value
+	for i := 10; i < len(c.v); i++ { // check other Vs still have old value
 		assert.Equal(t, c.v[i], byte(i))
 	}
 	assert.Equal(t, uint8(0x0), m[c.ir]) // check current pointer to ir blank
@@ -515,7 +533,7 @@ func TestCpu_Tick_0xFX33(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m)
+	c := getNewCPU(m, newKeyboard())
 	c.ir = uint16(222)
 	c.v[11] = byte(0x88)
 	err = c.Tick()
@@ -561,7 +579,7 @@ func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m)
+			c := getNewCPU(m, newKeyboard())
 			c.ir = tc.ir
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
@@ -572,10 +590,10 @@ func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 	}
 }
 
-func getNewCPU(m state.Memory) *cpu {
+func getNewCPU(m state.Memory, k Keyboard) *cpu {
 	s := rand.NewSource(42)
 	r := rand.New(s)
-	c := NewCPU(m, r)
+	c := NewCPU(m, r, k)
 	return c
 }
 
@@ -583,4 +601,22 @@ func opCodeToBytes(opcode uint16) (result []byte) {
 	result = make([]byte, 2)
 	binary.BigEndian.PutUint16(result, opcode)
 	return result
+}
+
+type keyboardMock struct {
+	mock.Mock
+}
+
+func (k *keyboardMock) waitForKeyPressed() (key byte) {
+	args := k.Called()
+	return args.Get(0).(byte)
+}
+
+func (k *keyboardMock) keyPressed(key byte) {
+	k.Called(key)
+}
+
+func (k *keyboardMock) isKeyPressed(key byte) bool {
+	args := k.Called(key)
+	return args.Bool(0)
 }
