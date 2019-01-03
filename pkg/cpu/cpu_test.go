@@ -509,6 +509,25 @@ func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
 	assert.Equal(t, uint8(0x0), m[c.ir]) // check current pointer to ir blank
 }
 
+func TestCpu_Tick_0xFX33(t *testing.T) {
+	bs := opCodeToBytes(0xfb33)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	c := getNewCPU(m)
+	c.ir = uint16(222)
+	c.v[11] = byte(0x88)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	assert.Equal(t, uint16(222), c.ir)
+	// Check BCD
+	assert.Equal(t, byte(0x1), m[c.ir])   // place the hundreds digit in memory at location in I,
+	assert.Equal(t, byte(0x3), m[c.ir+1]) // the tens digit at location I+1,
+	assert.Equal(t, byte(0x6), m[c.ir+2]) // and the ones digit at location I+2.)
+}
+
 func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 	var testCases = []struct {
 		name   string

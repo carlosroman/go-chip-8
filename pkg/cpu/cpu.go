@@ -2,6 +2,7 @@ package cpu
 
 import (
 	"encoding/binary"
+	"fmt"
 	"github.com/carlosroman/go-chip-8/pkg/state"
 	log "github.com/sirupsen/logrus"
 	"math/rand"
@@ -203,6 +204,13 @@ func (c *cpu) Tick() (err error) {
 			log.Info("Opcode: FX29")
 			x := getX(opcode)
 			c.ir = uint16(c.v[x] * 0x5)
+		case 0x0033:
+			// 0xFX33, BCD, set_BCD(Vx);, Stores the binary-coded decimal representation of VX, with the most significant of three digits at the address in I, the middle digit at I plus 1, and the least significant digit at I plus 2. (In other words, take the decimal representation of VX, place the hundreds digit in memory at location in I, the tens digit at location I+1, and the ones digit at location I+2.)
+			log.Info("Opcode: FX33")
+			x := getX(opcode)
+			c.m[c.ir] = c.v[x] / 100
+			c.m[c.ir+1] = (c.v[x] / 10) % 10
+			c.m[c.ir+2] = (c.v[x] % 100) % 10
 		case 0x55:
 			// 0xFX55, MEM, reg_dump(Vx,&I), Stores V0 to VX (including VX) in memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.
 			log.Info("Opcode: FX55")
@@ -234,6 +242,8 @@ func getX(opcode uint16) (x uint16) {
 	if log.IsLevelEnabled(log.DebugLevel) {
 		log.
 			WithField("x", x).
+			WithField("opcode", fmt.Sprintf("%#04x", opcode)).
+			WithField("opcode_val", opcode).
 			Debug("Got x")
 	}
 	return x
@@ -248,6 +258,8 @@ func getXY(opcode uint16, c *cpu) (x uint16, y uint16) {
 			WithField("vy", c.v[y]).
 			WithField("x", x).
 			WithField("vx", c.v[x]).
+			WithField("opcode", fmt.Sprintf("%#04x", opcode)).
+			WithField("opcode_val", opcode).
 			Debug("Got vy vx")
 	}
 	return x, y
