@@ -479,6 +479,36 @@ func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
 	assert.Equal(t, uint8(0x0), m[c.ir]) // check current pointer to ir blank
 }
 
+func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
+	bs := opCodeToBytes(0xf965)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	c := getNewCPU(m)
+	c.ir = uint16(222)
+	for i := range c.v {
+		c.v[i] = byte(i)
+	}
+	for i := uint16(0); i < 10; i++ {
+		m[c.ir+i] = byte(0x0af)
+	}
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	assert.Equal(t, uint16(9+222+1), c.ir)
+
+	for i := 0; i < 10; i++ {
+		log.WithField("m[x]", 222+i).WithField("vi", c.v[i]).Debug("checking memory")
+		assert.Equal(t, c.v[i], byte(0x0af))
+	}
+
+	for i := 10; i < len(c.v); i++ { // check other Vs still ahve old value
+		assert.Equal(t, c.v[i], byte(i))
+	}
+	assert.Equal(t, uint8(0x0), m[c.ir]) // check current pointer to ir blank
+}
+
 func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 	var testCases = []struct {
 		name   string

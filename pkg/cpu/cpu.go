@@ -211,7 +211,14 @@ func (c *cpu) Tick() (err error) {
 				c.m[c.ir+i] = c.v[i]
 			}
 			c.ir += x + 1
-			log.Infof("c.ir=%v", c.ir)
+		case 0x65:
+			// 0xFills V0 to VX (including VX) with values from memory starting at address I. The offset from I is increased by 1 for each value written, but I itself is left unmodified.
+			log.Info("Opcode: FX65")
+			x := getX(opcode)
+			for i := uint16(0); i <= x; i++ {
+				c.v[i] = c.m[c.ir+i]
+			}
+			c.ir += x + 1
 		default:
 			log.Warnf("Unknown opcode [0xF000]: %#04x:%#04x\n", val, sub)
 		}
