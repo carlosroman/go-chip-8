@@ -232,6 +232,11 @@ func (c *cpu) Tick() (err error) {
 			log.Info("Opcode: FX15")
 			x := getX(opcode)
 			c.t.SetDelay(c.v[x])
+		case 0x0018:
+			// 0xFX18, Sound, sound_timer(Vx), Sets the sound timer to VX.
+			log.Info("Opcode: FX18")
+			x := getX(opcode)
+			c.t.SetSound(c.v[x])
 		case 0x001E:
 			// 0xFX1E, MEM, I +=Vx 	Adds VX to I.
 			log.Info("Opcode: FX1E")

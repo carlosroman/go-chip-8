@@ -16,5 +16,5 @@ func TestTimer_SetSound(t *testing.T) {
 	ti := NewTimer()
 	assert.NotNil(t, ti)
 	ti.SetSound(0xaa)
-	assert.Equal(t, byte(0xaa), ti.sound)
+	assert.Equal(t, byte(0xaa), ti.GetSound())
 }

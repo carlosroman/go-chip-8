@@ -29,3 +29,9 @@ func (t *timer) GetDelay() (val byte) {
 	defer t.lock.RUnlock()
 	return t.delay
 }
+
+func (t *timer) GetSound() (val byte) {
+	t.lock.RLock()
+	defer t.lock.RUnlock()
+	return t.sound
+}
