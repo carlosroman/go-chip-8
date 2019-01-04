@@ -28,5 +28,5 @@ func BenchmarkStack(b *testing.B) {
 func getCPU(b *testing.B, m state.Memory) *cpu {
 	b.StopTimer()
 	defer b.StartTimer()
-	return getNewCPU(m, newKeyboard())
+	return getNewCPU(m, newKeyboard(), NewTimer())
 }

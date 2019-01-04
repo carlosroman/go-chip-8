@@ -23,7 +23,7 @@ func TestNewCPU(t *testing.T) {
 	fmt.Println(bf.Len())
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	assert.NotNil(t, c)
 	assert.Equal(t, m, c.m)
 }
@@ -34,7 +34,7 @@ func TestCpu_Tick_0x00EE(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	exp := int16(122)
 	c.stack.Push(exp)
 	err = c.Tick()
@@ -48,7 +48,7 @@ func TestCpu_Tick_0xANNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -61,7 +61,7 @@ func TestCpu_Tick_0xBNNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	c.v[0] = uint8(5)
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -74,7 +74,7 @@ func TestCpu_Tick_0xCXN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -87,7 +87,7 @@ func TestCpu_Tick_0x1NNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(1263), c.pc)
@@ -99,7 +99,7 @@ func TestCpu_Tick_0x2NNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(1263), c.pc)
@@ -137,7 +137,7 @@ func TestCpu_Tick_0x3XNN(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard())
+			c := getNewCPU(m, newKeyboard(), NewTimer())
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
 			assert.NoError(t, err)
@@ -176,7 +176,7 @@ func TestCpu_Tick_0x4XNN(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard())
+			c := getNewCPU(m, newKeyboard(), NewTimer())
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
 			assert.NoError(t, err)
@@ -221,7 +221,7 @@ func TestCpu_Tick_0x5XY0(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard())
+			c := getNewCPU(m, newKeyboard(), NewTimer())
 			c.v[tc.x] = tc.vx
 			c.v[tc.y] = tc.vy
 			err = c.Tick()
@@ -267,7 +267,7 @@ func TestCpu_Tick_0x9XY0(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard())
+			c := getNewCPU(m, newKeyboard(), NewTimer())
 			c.v[tc.x] = tc.vx
 			c.v[tc.y] = tc.vy
 			err = c.Tick()
@@ -283,7 +283,7 @@ func TestCpu_Tick_0x6XNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -296,7 +296,7 @@ func TestCpu_Tick_0x7XNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	c.v[4] = uint8(0x0b) // 11
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -443,7 +443,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard())
+			c := getNewCPU(m, newKeyboard(), NewTimer())
 			// add a value for Y
 			c.v[tc.y] = tc.vy
 			// add a value for X
@@ -510,7 +510,7 @@ func TestCpu_Tick_0xEX(t *testing.T) {
 			assert.NoError(t, err)
 			k := &keyboardMock{}
 			k.On("isKeyPressed", tc.vx).Return(tc.isKeyPressed)
-			c := getNewCPU(m, k)
+			c := getNewCPU(m, k, NewTimer())
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
 			assert.NoError(t, err)
@@ -518,6 +518,21 @@ func TestCpu_Tick_0xEX(t *testing.T) {
 			k.AssertExpectations(t)
 		})
 	}
+}
+
+func TestCpu_Tick_0xFX07(t *testing.T) {
+	bs := opCodeToBytes(0xf907)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	ti := NewTimer()
+	ti.SetDelay(0xaa)
+	c := getNewCPU(m, newKeyboard(), ti)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	assert.Equal(t, byte(0xaa), c.v[9])
 }
 
 func TestCpu_Tick_0xFX0A(t *testing.T) {
@@ -528,7 +543,7 @@ func TestCpu_Tick_0xFX0A(t *testing.T) {
 	assert.NoError(t, err)
 	k := &keyboardMock{}
 	k.On("waitForKeyPressed").WaitUntil(time.After(time.Second)).Return(byte(0xb))
-	c := getNewCPU(m, k)
+	c := getNewCPU(m, k, NewTimer())
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -542,7 +557,7 @@ func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	for i := range c.v {
 		c.v[i] = byte(i)
 	}
@@ -565,7 +580,7 @@ func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	c.ir = uint16(222)
 	for i := range c.v {
 		c.v[i] = byte(i)
@@ -595,7 +610,7 @@ func TestCpu_Tick_0xFX33(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard())
+	c := getNewCPU(m, newKeyboard(), NewTimer())
 	c.ir = uint16(222)
 	c.v[11] = byte(0x88)
 	err = c.Tick()
@@ -641,7 +656,7 @@ func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard())
+			c := getNewCPU(m, newKeyboard(), NewTimer())
 			c.ir = tc.ir
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
@@ -652,10 +667,10 @@ func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 	}
 }
 
-func getNewCPU(m state.Memory, k Keyboard) *cpu {
+func getNewCPU(m state.Memory, k Keyboard, t *timer) *cpu {
 	s := rand.NewSource(42)
 	r := rand.New(s)
-	c := NewCPU(m, r, k)
+	c := NewCPU(m, r, k, t)
 	return c
 }
 

@@ -17,6 +17,7 @@ type cpu struct {
 	v     []byte       // CPU registers
 	r     *rand.Rand   // Random number generator
 	k     Keyboard     // Keyboard wrapper
+	t     *timer       // Count down timer
 }
 
 func (c *cpu) Tick() (err error) {
@@ -215,6 +216,11 @@ func (c *cpu) Tick() (err error) {
 		c.pc += 2
 	case 0xF000:
 		switch sub := opcode & 0x00FF; sub {
+		case 0x0007:
+			// 0xFX07, Timer, Vx = get_delay(), Sets VX to the value of the delay timer.
+			log.Info("Opcode: FX07")
+			x := getX(opcode)
+			c.v[x] = c.t.GetDelay()
 		case 0x000a:
 			// 0xFX0A, KeyOp, Vx = get_key(), A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event)
 			log.Info("Opcode: FX0A")
@@ -292,7 +298,7 @@ func getXY(opcode uint16, c *cpu) (x uint16, y uint16) {
 	return x, y
 }
 
-func NewCPU(memory state.Memory, rgen *rand.Rand, k Keyboard) *cpu {
+func NewCPU(memory state.Memory, rgen *rand.Rand, k Keyboard, t *timer) *cpu {
 	return &cpu{
 		m:     memory,
 		pc:    0x200,            // Program counter starts at 0x200 (512)
@@ -300,5 +306,6 @@ func NewCPU(memory state.Memory, rgen *rand.Rand, k Keyboard) *cpu {
 		stack: state.InitStack(),
 		r:     rgen,
 		k:     k,
+		t:     t,
 	}
 }
