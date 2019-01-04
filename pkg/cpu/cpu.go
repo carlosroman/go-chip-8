@@ -18,6 +18,8 @@ type cpu struct {
 	r     *rand.Rand   // Random number generator
 	k     Keyboard     // Keyboard wrapper
 	t     *timer       // Count down timer
+	fb    []byte       // Frame buffer
+	s     Screen       // Screen
 }
 
 func (c *cpu) Tick() (err error) {
@@ -32,7 +34,11 @@ func (c *cpu) Tick() (err error) {
 		case 0x00E0:
 			log.Info("Opcode: 00E0")
 			// 0x00E0, Display, disp_clear(), Clears the screen.
-			log.Debug("Clear screen")
+			for i := range c.fb {
+				c.fb[i] = byte(0x0)
+			}
+			c.s.Draw(c.fb)
+			c.pc += 2
 		case 0x00EE:
 			// 0x00EE, Flow, return;, Returns from a subroutine.
 			log.Info("Opcode: 00EE")
@@ -308,7 +314,7 @@ func getXY(opcode uint16, c *cpu) (x uint16, y uint16) {
 	return x, y
 }
 
-func NewCPU(memory state.Memory, rgen *rand.Rand, k Keyboard, t *timer) *cpu {
+func NewCPU(memory state.Memory, rgen *rand.Rand, k Keyboard, t *timer, s Screen) *cpu {
 	return &cpu{
 		m:     memory,
 		pc:    0x200,            // Program counter starts at 0x200 (512)
@@ -317,5 +323,7 @@ func NewCPU(memory state.Memory, rgen *rand.Rand, k Keyboard, t *timer) *cpu {
 		r:     rgen,
 		k:     k,
 		t:     t,
+		fb:    make([]byte, 64*32),
+		s:     s,
 	}
 }

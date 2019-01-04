@@ -28,5 +28,12 @@ func BenchmarkStack(b *testing.B) {
 func getCPU(b *testing.B, m state.Memory) *cpu {
 	b.StopTimer()
 	defer b.StartTimer()
-	return getNewCPU(m, newKeyboard(), NewTimer())
+	return getNewCPU(m, newKeyboard(), NewTimer(), &noopScreen{})
+}
+
+type noopScreen struct {
+}
+
+func (s *noopScreen) Draw(frameBuffer []byte) {
+
 }
