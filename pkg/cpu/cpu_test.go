@@ -551,6 +551,22 @@ func TestCpu_Tick_0xFX0A(t *testing.T) {
 	assert.Equal(t, byte(0xb), c.v[9])
 }
 
+func TestCpu_Tick_0xFX15(t *testing.T) {
+	bs := opCodeToBytes(0xf915)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	ti := NewTimer()
+	ti.SetDelay(0xaa)
+	c := getNewCPU(m, newKeyboard(), ti)
+	c.v[9] = byte(0x33)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	assert.Equal(t, byte(0x33), ti.GetDelay())
+}
+
 func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
 	bs := opCodeToBytes(0xf955)
 	m := state.InitMemory()

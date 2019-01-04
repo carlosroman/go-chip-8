@@ -227,6 +227,11 @@ func (c *cpu) Tick() (err error) {
 			key := c.k.waitForKeyPressed()
 			x := getX(opcode)
 			c.v[x] = key
+		case 0x0015:
+			// 0xFX15, Timer, delay_timer(Vx), Sets the delay timer to VX.
+			log.Info("Opcode: FX15")
+			x := getX(opcode)
+			c.t.SetDelay(c.v[x])
 		case 0x001E:
 			// 0xFX1E, MEM, I +=Vx 	Adds VX to I.
 			log.Info("Opcode: FX1E")
