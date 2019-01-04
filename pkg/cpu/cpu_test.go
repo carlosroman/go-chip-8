@@ -469,7 +469,7 @@ func TestCpu_Tick_0xEX(t *testing.T) {
 	}{
 		{
 			name:         "0xEX9E no skip",
-			opcode:       0xE9E7,
+			opcode:       0xE99E,
 			x:            9,
 			vx:           6,
 			isKeyPressed: false,
@@ -477,10 +477,26 @@ func TestCpu_Tick_0xEX(t *testing.T) {
 		},
 		{
 			name:         "0xEX9E skip",
-			opcode:       0xE9E7,
+			opcode:       0xE99E,
 			x:            9,
 			vx:           8,
 			isKeyPressed: true,
+			expPc:        516,
+		},
+		{
+			name:         "EXA1 no skip",
+			opcode:       0xE9A1,
+			x:            9,
+			vx:           6,
+			isKeyPressed: true,
+			expPc:        514,
+		},
+		{
+			name:         "EXA1 skip",
+			opcode:       0xE9A1,
+			x:            9,
+			vx:           8,
+			isKeyPressed: false,
 			expPc:        516,
 		},
 	}
@@ -499,6 +515,7 @@ func TestCpu_Tick_0xEX(t *testing.T) {
 			err = c.Tick()
 			assert.NoError(t, err)
 			assert.Equal(t, tc.expPc, c.pc)
+			k.AssertExpectations(t)
 		})
 	}
 }

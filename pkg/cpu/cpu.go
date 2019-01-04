@@ -194,13 +194,25 @@ func (c *cpu) Tick() (err error) {
 			c.pc += 2
 		}
 	case 0xE000:
-		// 0xEX9E, KeyOp, if(key()==Vx), Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block)
-		log.Info("Opcode: EX9E")
-		x := getX(opcode)
-		c.pc += 2
-		if c.k.isKeyPressed(c.v[x]) {
-			c.pc += 2
+		switch sub := opcode & 0x00FF; sub {
+		case 0x009E:
+			// 0xEX9E, KeyOp, if(key()==Vx), Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block)
+			log.Info("Opcode: EX9E")
+			x := getX(opcode)
+			if c.k.isKeyPressed(c.v[x]) {
+				c.pc += 2
+			}
+		case 0x00A1:
+			//  0xEXA1, KeyOp, if(key()!=Vx), Skips the next instruction if the key stored in VX isn't pressed. (Usually the next instruction is a jump to skip a code block)
+			log.Info("Opcode: EXA1")
+			x := getX(opcode)
+			if !c.k.isKeyPressed(c.v[x]) {
+				c.pc += 2
+			}
+		default:
+			log.Warnf("Unknown opcode [0xE000]: %#04x:%#04x\n", val, sub)
 		}
+		c.pc += 2
 	case 0xF000:
 		switch sub := opcode & 0x00FF; sub {
 		case 0x000a:
