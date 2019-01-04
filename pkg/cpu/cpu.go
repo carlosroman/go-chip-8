@@ -193,6 +193,14 @@ func (c *cpu) Tick() (err error) {
 		if c.v[x] != c.v[y] {
 			c.pc += 2
 		}
+	case 0xE000:
+		// 0xEX9E, KeyOp, if(key()==Vx), Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block)
+		log.Info("Opcode: EX9E")
+		x := getX(opcode)
+		c.pc += 2
+		if c.k.isKeyPressed(c.v[x]) {
+			c.pc += 2
+		}
 	case 0xF000:
 		switch sub := opcode & 0x00FF; sub {
 		case 0x000a:

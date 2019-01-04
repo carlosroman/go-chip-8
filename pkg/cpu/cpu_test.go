@@ -458,6 +458,51 @@ func TestCpu_Tick_0x8(t *testing.T) {
 	}
 }
 
+func TestCpu_Tick_0xEX(t *testing.T) {
+	var testCases = []struct {
+		name         string
+		opcode       uint16
+		x            int
+		vx           uint8
+		isKeyPressed bool
+		expPc        int16
+	}{
+		{
+			name:         "0xEX9E no skip",
+			opcode:       0xE9E7,
+			x:            9,
+			vx:           6,
+			isKeyPressed: false,
+			expPc:        514,
+		},
+		{
+			name:         "0xEX9E skip",
+			opcode:       0xE9E7,
+			x:            9,
+			vx:           8,
+			isKeyPressed: true,
+			expPc:        516,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			bs := opCodeToBytes(tc.opcode)
+			m := state.InitMemory()
+			bf := bytes.NewBuffer(bs)
+			err := m.LoadMemory(bf)
+			assert.NoError(t, err)
+			k := &keyboardMock{}
+			k.On("isKeyPressed", tc.vx).Return(tc.isKeyPressed)
+			c := getNewCPU(m, k)
+			c.v[tc.x] = tc.vx
+			err = c.Tick()
+			assert.NoError(t, err)
+			assert.Equal(t, tc.expPc, c.pc)
+		})
+	}
+}
+
 func TestCpu_Tick_0xFX0A(t *testing.T) {
 	bs := opCodeToBytes(0xf90a)
 	m := state.InitMemory()
