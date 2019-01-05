@@ -49,6 +49,76 @@ func TestCpu_Tick_0x00E0(t *testing.T) {
 	sm.AssertCalled(t, "Draw", fb)
 }
 
+func TestCpu_Tick_0xDXYN_no_collision(t *testing.T) {
+	bs := opCodeToBytes(0xD003)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	sm := &screenMock{}
+	c := getNewCPU(m, newKeyboard(), NewTimer(), sm)
+	c.ir = uint16(55)
+	m[c.ir] = 0x03C
+	m[c.ir+1] = 0x0C3
+	m[c.ir+2] = 0x0FF
+
+	fb := getExpectedFrameBuffer()
+	sm.On("Draw", mock.Anything)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	assert.Equal(t, byte(0x0), c.v[0xF])
+	sm.AssertCalled(t, "Draw", fb)
+}
+
+func TestCpu_Tick_0xDXYN_has_collision(t *testing.T) {
+	bs := opCodeToBytes(0xD003)
+	m := state.InitMemory()
+	bf := bytes.NewBuffer(bs)
+	err := m.LoadMemory(bf)
+	assert.NoError(t, err)
+	sm := &screenMock{}
+	c := getNewCPU(m, newKeyboard(), NewTimer(), sm)
+	c.ir = uint16(55)
+	m[c.ir] = 0x03C
+	m[c.ir+1] = 0x0C3
+	m[c.ir+2] = 0x0FF
+
+	c.fb[2] = 0x1
+	fb := getExpectedFrameBuffer()
+	fb[2] = 0x0
+	sm.On("Draw", mock.Anything)
+	err = c.Tick()
+	assert.NoError(t, err)
+	assert.Equal(t, int16(514), c.pc)
+	assert.Equal(t, byte(0x1), c.v[0xF])
+	sm.AssertCalled(t, "Draw", fb)
+}
+
+func getExpectedFrameBuffer() []byte {
+	fb := make([]byte, 64*32)
+	//0x3C   00111100     ****
+	fb[2] = 0x1
+	fb[3] = 0x1
+	fb[4] = 0x1
+	fb[5] = 0x1
+	//0xC3   11000011   **    **
+	fb[64+0] = 0x1
+	fb[64+1] = 0x1
+	fb[64+6] = 0x1
+	fb[64+7] = 0x1
+	//0xFF   11111111   ********
+	fb[64+64+0] = 0x1
+	fb[64+64+1] = 0x1
+	fb[64+64+2] = 0x1
+	fb[64+64+3] = 0x1
+	fb[64+64+4] = 0x1
+	fb[64+64+5] = 0x1
+	fb[64+64+6] = 0x1
+	fb[64+64+7] = 0x1
+	return fb
+}
+
 func TestCpu_Tick_0x00EE(t *testing.T) {
 	bs := opCodeToBytes(0x00EE)
 	m := state.InitMemory()

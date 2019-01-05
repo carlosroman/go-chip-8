@@ -66,6 +66,25 @@ func (c *cpu) Tick() (err error) {
 		nn := bs[1]
 		c.v[x] = byte(r) & nn
 		c.pc += 2
+	case 0xD000:
+		// 0xDXYN, Disp, draw(Vx,Vy,N), Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. Each row of 8 pixels is read as bit-coded starting from memory location I; I value doesn’t change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t happen
+		log.Info("Opcode: DXYN")
+		x, y := getXY(opcode, c)
+		n := opcode & 0x000F
+		c.v[0xF] = 0x0
+		for yl := uint16(0); yl < n; yl++ {
+			px := c.m[c.ir+yl]
+			for xl := uint16(0); xl < 8; xl++ {
+				if px&(0x80>>xl) != 0 {
+					if c.fb[(x+xl+((y+yl)*64))] == 0x1 {
+						c.v[0xF] = 0x1
+					}
+					c.fb[x+xl+((y+yl)*64)] ^= 0x1
+				}
+			}
+		}
+		c.s.Draw(c.fb)
+		c.pc += 2
 	case 0x1000:
 		// 0x1NNN, Flow, goto NNN;, Jumps to address NNN.
 		log.Info("Opcode: 1NNN")
