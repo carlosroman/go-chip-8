@@ -1,6 +1,7 @@
 package state
 
 import (
+	log "github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"sync"
@@ -13,6 +14,7 @@ func (m Memory) LoadMemory(r io.Reader) (err error) {
 	if err != nil {
 		return err
 	}
+	log.Infof("loading %d bytes", len(b))
 	for i := range b {
 		m[i+512] = b[i]
 	}
