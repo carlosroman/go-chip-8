@@ -42,7 +42,7 @@ func (t *timer) GetSound() (val byte) {
 	return t.sound
 }
 
-func (t *timer) tick() {
+func (t *timer) tick() (err error) {
 	log.Debug("tick")
 	t.lock.Lock()
 	defer t.lock.Unlock()
@@ -52,17 +52,25 @@ func (t *timer) tick() {
 	if t.sound > 0 {
 		t.sound -= 1
 	}
+	return err
 }
 
-func (t *timer) Start(ctx context.Context) {
-	limit := rate.Every(time.Second / 60)
+func (t *timer) Start(ctx context.Context, duration time.Duration) {
+	Start("timer", ctx, duration, t.tick)
+}
+
+func Start(name string, ctx context.Context, d time.Duration, tick func() error) {
+	limit := rate.Every(d)
 	limiter := rate.NewLimiter(limit, 1)
 	for {
 		err := limiter.Wait(ctx)
 		if err != nil {
-			log.WithError(err).Info("Got an error, exiting")
+			log.WithField("name", name).WithError(err).Warn("Got an error, exiting")
 			break
 		}
-		t.tick()
+		if err = tick(); err != nil {
+			log.WithField("name", name).WithError(err).Warn("Got an error running tick, exiting")
+			break
+		}
 	}
 }

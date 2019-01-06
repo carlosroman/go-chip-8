@@ -35,7 +35,7 @@ func TestTimer_Start(t *testing.T) {
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {
-		ti.Start(ctx)
+		ti.Start(ctx, time.Second/60)
 		wg.Done()
 	}()
 	go func() {

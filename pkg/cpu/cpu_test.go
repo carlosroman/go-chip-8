@@ -23,7 +23,7 @@ func TestNewCPU(t *testing.T) {
 	fmt.Println(bf.Len())
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	assert.NotNil(t, c)
 	assert.Equal(t, m, c.m)
 }
@@ -35,7 +35,7 @@ func TestCpu_Tick_0x00E0(t *testing.T) {
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
 	sm := &screenMock{}
-	c := getNewCPU(m, newKeyboard(), NewTimer(), sm)
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), sm)
 
 	fb := make([]byte, 64*32)
 	for i := range fb {
@@ -56,7 +56,7 @@ func TestCpu_Tick_0xDXYN_no_collision(t *testing.T) {
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
 	sm := &screenMock{}
-	c := getNewCPU(m, newKeyboard(), NewTimer(), sm)
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), sm)
 	c.ir = uint16(55)
 	m[c.ir] = 0x03C
 	m[c.ir+1] = 0x0C3
@@ -78,7 +78,7 @@ func TestCpu_Tick_0xDXYN_has_collision(t *testing.T) {
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
 	sm := &screenMock{}
-	c := getNewCPU(m, newKeyboard(), NewTimer(), sm)
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), sm)
 	c.ir = uint16(55)
 	m[c.ir] = 0x03C
 	m[c.ir+1] = 0x0C3
@@ -125,7 +125,7 @@ func TestCpu_Tick_0x00EE(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	exp := int16(122)
 	c.stack.Push(exp)
 	err = c.Tick()
@@ -139,7 +139,7 @@ func TestCpu_Tick_0xANNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -152,7 +152,7 @@ func TestCpu_Tick_0xBNNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	c.v[0] = uint8(5)
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -165,7 +165,7 @@ func TestCpu_Tick_0xCXN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -178,7 +178,7 @@ func TestCpu_Tick_0x1NNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(1263), c.pc)
@@ -190,7 +190,7 @@ func TestCpu_Tick_0x2NNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(1263), c.pc)
@@ -228,7 +228,7 @@ func TestCpu_Tick_0x3XNN(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+			c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
 			assert.NoError(t, err)
@@ -267,7 +267,7 @@ func TestCpu_Tick_0x4XNN(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+			c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
 			assert.NoError(t, err)
@@ -312,7 +312,7 @@ func TestCpu_Tick_0x5XY0(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+			c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 			c.v[tc.x] = tc.vx
 			c.v[tc.y] = tc.vy
 			err = c.Tick()
@@ -358,7 +358,7 @@ func TestCpu_Tick_0x9XY0(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+			c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 			c.v[tc.x] = tc.vx
 			c.v[tc.y] = tc.vy
 			err = c.Tick()
@@ -374,7 +374,7 @@ func TestCpu_Tick_0x6XNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -387,7 +387,7 @@ func TestCpu_Tick_0x7XNN(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	c.v[4] = uint8(0x0b) // 11
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -534,7 +534,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+			c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 			// add a value for Y
 			c.v[tc.y] = tc.vy
 			// add a value for X
@@ -619,7 +619,7 @@ func TestCpu_Tick_0xFX07(t *testing.T) {
 	assert.NoError(t, err)
 	ti := NewTimer()
 	ti.SetDelay(0xaa)
-	c := getNewCPU(m, newKeyboard(), ti, &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), ti, &screenMock{})
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
@@ -650,7 +650,7 @@ func TestCpu_Tick_0xFX15(t *testing.T) {
 	assert.NoError(t, err)
 	ti := NewTimer()
 	ti.SetDelay(0xaa)
-	c := getNewCPU(m, newKeyboard(), ti, &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), ti, &screenMock{})
 	c.v[9] = byte(0x33)
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -666,7 +666,7 @@ func TestCpu_Tick_0xFX18(t *testing.T) {
 	assert.NoError(t, err)
 	ti := NewTimer()
 	ti.SetSound(0xaa)
-	c := getNewCPU(m, newKeyboard(), ti, &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), ti, &screenMock{})
 	c.v[9] = byte(0x33)
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -680,7 +680,7 @@ func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	for i := range c.v {
 		c.v[i] = byte(i)
 	}
@@ -703,7 +703,7 @@ func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	c.ir = uint16(222)
 	for i := range c.v {
 		c.v[i] = byte(i)
@@ -733,7 +733,7 @@ func TestCpu_Tick_0xFX33(t *testing.T) {
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
-	c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	c.ir = uint16(222)
 	c.v[11] = byte(0x88)
 	err = c.Tick()
@@ -779,7 +779,7 @@ func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 			bf := bytes.NewBuffer(bs)
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
-			c := getNewCPU(m, newKeyboard(), NewTimer(), &screenMock{})
+			c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 			c.ir = tc.ir
 			c.v[tc.x] = tc.vx
 			err = c.Tick()

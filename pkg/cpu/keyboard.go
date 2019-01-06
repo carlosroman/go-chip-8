@@ -14,7 +14,7 @@ type keyboard struct {
 	wait chan byte
 }
 
-func newKeyboard() Keyboard {
+func NewKeyboard() Keyboard {
 	return &keyboard{
 		wait: make(chan byte, 1),
 	}

@@ -9,13 +9,13 @@ import (
 )
 
 func TestKeyboard_isKeyPressed(t *testing.T) {
-	k := newKeyboard()
+	k := NewKeyboard()
 	k.keyPressed(0xa)
 	assert.True(t, k.isKeyPressed(0xa))
 }
 
 func TestKeyboard_waitForKeyPressed(t *testing.T) {
-	k := newKeyboard()
+	k := NewKeyboard()
 	wg := sync.WaitGroup{}
 	wg.Add(1)
 	go func() {

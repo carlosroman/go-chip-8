@@ -66,7 +66,7 @@ func addToMemory(m state.Memory, opcode uint16, loc int) {
 func getCPU(b *testing.B, m state.Memory) *cpu {
 	b.StopTimer()
 	defer b.StartTimer()
-	return getNewCPU(m, newKeyboard(), NewTimer(), &noopScreen{})
+	return getNewCPU(m, NewKeyboard(), NewTimer(), &noopScreen{})
 }
 
 type noopScreen struct {
