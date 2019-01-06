@@ -14,7 +14,7 @@ func init() {
 }
 
 const (
-	C8PIC_sha  = "2f1dece0b277f953c84e0f48ae39a32f53b1796aae67ce43e873d9dd2abb4d0a"
+	C8PIC_sha  = "4bbb2f95d64e976bb90837df5c9248e4632974c4137759d33589891ee3622977" // includes fonts
 	C8PIC_path = "../../test/roms/C8PIC.ch8"
 )
 
@@ -30,6 +30,10 @@ func TestLoadMemory(t *testing.T) {
 	assert.Equal(t,
 		C8PIC_sha,
 		fmt.Sprintf("%x", hash))
+	expF := getFonts()
+	for i := 0; i < 80; i++ {
+		assert.Equal(t, expF[i], m[i], "Expected m[%v] to have value '%v'", i, expF[i])
+	}
 }
 
 func loadMemoryTest(tb testing.TB) Memory {
