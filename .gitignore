@@ -526,4 +526,5 @@ target/
 *.coverprofile
 .envrc
 tmp/
+*.exe
 
