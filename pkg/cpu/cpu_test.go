@@ -600,7 +600,7 @@ func TestCpu_Tick_0xEX(t *testing.T) {
 			err := m.LoadMemory(bf)
 			assert.NoError(t, err)
 			k := &keyboardMock{}
-			k.On("isKeyPressed", tc.vx).Return(tc.isKeyPressed)
+			k.On("IsKeyPressed", tc.vx).Return(tc.isKeyPressed)
 			c := getNewCPU(m, k, NewTimer(), &screenMock{})
 			c.v[tc.x] = tc.vx
 			err = c.Tick()
@@ -633,12 +633,12 @@ func TestCpu_Tick_0xFX0A(t *testing.T) {
 	err := m.LoadMemory(bf)
 	assert.NoError(t, err)
 	k := &keyboardMock{}
-	k.On("waitForKeyPressed").WaitUntil(time.After(time.Second)).Return(byte(0xb))
+	k.On("WaitForKeyPressed").WaitUntil(time.After(time.Second)).Return(byte(0xb))
 	c := getNewCPU(m, k, NewTimer(), &screenMock{})
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
-	k.AssertCalled(t, "waitForKeyPressed")
+	k.AssertCalled(t, "WaitForKeyPressed")
 	assert.Equal(t, byte(0xb), c.v[9])
 }
 
@@ -807,16 +807,16 @@ type keyboardMock struct {
 	mock.Mock
 }
 
-func (k *keyboardMock) waitForKeyPressed() (key byte) {
+func (k *keyboardMock) WaitForKeyPressed() (key byte) {
 	args := k.Called()
 	return args.Get(0).(byte)
 }
 
-func (k *keyboardMock) keyPressed(key byte) {
+func (k *keyboardMock) KeyPressed(key byte) {
 	k.Called(key)
 }
 
-func (k *keyboardMock) isKeyPressed(key byte) bool {
+func (k *keyboardMock) IsKeyPressed(key byte) bool {
 	args := k.Called(key)
 	return args.Bool(0)
 }

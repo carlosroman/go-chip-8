@@ -3,9 +3,9 @@ package cpu
 import "sync"
 
 type Keyboard interface {
-	waitForKeyPressed() (key byte)
-	isKeyPressed(key byte) bool
-	keyPressed(key byte)
+	WaitForKeyPressed() (key byte)
+	IsKeyPressed(key byte) bool
+	KeyPressed(key byte)
 }
 
 type keyboard struct {
@@ -20,18 +20,18 @@ func NewKeyboard() Keyboard {
 	}
 }
 
-func (k *keyboard) isKeyPressed(key byte) bool {
+func (k *keyboard) IsKeyPressed(key byte) bool {
 	k.loc.RLock()
 	defer k.loc.RUnlock()
 	return k.kp == key
 }
 
-func (k *keyboard) waitForKeyPressed() (key byte) {
+func (k *keyboard) WaitForKeyPressed() (key byte) {
 	key = <-k.wait
 	return key
 }
 
-func (k *keyboard) keyPressed(key byte) {
+func (k *keyboard) KeyPressed(key byte) {
 	k.loc.Lock()
 	defer k.loc.Unlock()
 	k.kp = key

@@ -225,14 +225,14 @@ func (c *cpu) Tick() (err error) {
 			// 0xEX9E, KeyOp, if(key()==Vx), Skips the next instruction if the key stored in VX is pressed. (Usually the next instruction is a jump to skip a code block)
 			log.Info("Opcode: EX9E")
 			x := getX(opcode)
-			if c.k.isKeyPressed(c.v[x]) {
+			if c.k.IsKeyPressed(c.v[x]) {
 				c.pc += 2
 			}
 		case 0x00A1:
 			//  0xEXA1, KeyOp, if(key()!=Vx), Skips the next instruction if the key stored in VX isn't pressed. (Usually the next instruction is a jump to skip a code block)
 			log.Info("Opcode: EXA1")
 			x := getX(opcode)
-			if !c.k.isKeyPressed(c.v[x]) {
+			if !c.k.IsKeyPressed(c.v[x]) {
 				c.pc += 2
 			}
 		default:
@@ -249,7 +249,7 @@ func (c *cpu) Tick() (err error) {
 		case 0x000a:
 			// 0xFX0A, KeyOp, Vx = get_key(), A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event)
 			log.Info("Opcode: FX0A")
-			key := c.k.waitForKeyPressed()
+			key := c.k.WaitForKeyPressed()
 			x := getX(opcode)
 			c.v[x] = key
 		case 0x0015:

@@ -10,8 +10,8 @@ import (
 
 func TestKeyboard_isKeyPressed(t *testing.T) {
 	k := NewKeyboard()
-	k.keyPressed(0xa)
-	assert.True(t, k.isKeyPressed(0xa))
+	k.KeyPressed(0xa)
+	assert.True(t, k.IsKeyPressed(0xa))
 }
 
 func TestKeyboard_waitForKeyPressed(t *testing.T) {
@@ -20,14 +20,14 @@ func TestKeyboard_waitForKeyPressed(t *testing.T) {
 	wg.Add(1)
 	go func() {
 		wg.Wait()
-		assert.False(t, k.isKeyPressed(0xa))
+		assert.False(t, k.IsKeyPressed(0xa))
 		log.Info("pressing key")
-		k.keyPressed(0xb)
+		k.KeyPressed(0xb)
 	}()
 	wg.Done()
 	log.Info("waiting for key")
-	key := k.waitForKeyPressed()
+	key := k.WaitForKeyPressed()
 	log.Info("checking key")
-	assert.True(t, k.isKeyPressed(0xb))
+	assert.True(t, k.IsKeyPressed(0xb))
 	assert.Equal(t, byte(0xb), key)
 }
