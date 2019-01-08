@@ -41,7 +41,9 @@ func (c *cpu) Tick() (err error) {
 		case 0x00EE:
 			// 0x00EE, Flow, return;, Returns from a subroutine.
 			log.Info("Opcode: 00EE")
-			c.pc = c.stack.Pop()
+			pop := c.stack.Pop()
+			log.WithField("pop", pop).WithField("pc", c.pc).Info("Returning")
+			c.pc = pop
 		default:
 			log.Warnf("Unknown opcode [0x0000]: %#04x:%#04x\n", val, sub)
 		}
@@ -110,6 +112,7 @@ func (c *cpu) Tick() (err error) {
 		log.Info("Opcode: 2NNN")
 		nnn := opcode & 0x0FFF
 		log.Debugf("nnn:%v", nnn)
+		log.WithField("pc", c.pc).WithField("nnn", int16(nnn)).Info("Pushing")
 		c.stack.Push(c.pc)
 		c.pc = int16(nnn)
 	case 0x3000:
@@ -259,7 +262,9 @@ func (c *cpu) Tick() (err error) {
 			// 0xFX07, Timer, Vx = get_delay(), Sets VX to the value of the delay timer.
 			log.Info("Opcode: FX07")
 			x := getX(opcode)
-			c.v[x] = c.t.GetDelay()
+			d := c.t.GetDelay()
+			log.WithField("x", x).WithField("d", d).Info("Setting Vx to delay")
+			c.v[x] = d
 		case 0x000a:
 			// 0xFX0A, KeyOp, Vx = get_key(), A key press is awaited, and then stored in VX. (Blocking Operation. All instruction halted until next key event)
 			log.Info("Opcode: FX0A")
@@ -270,6 +275,7 @@ func (c *cpu) Tick() (err error) {
 			// 0xFX15, Timer, delay_timer(Vx), Sets the delay timer to VX.
 			log.Info("Opcode: FX15")
 			x := getX(opcode)
+			log.WithField("x", x).WithField("d", c.v[x]).Info("Setting delay to Vx")
 			c.t.SetDelay(c.v[x])
 		case 0x0018:
 			// 0xFX18, Sound, sound_timer(Vx), Sets the sound timer to VX.
@@ -282,7 +288,6 @@ func (c *cpu) Tick() (err error) {
 			x := getX(opcode)
 			ux := uint16(c.v[x])
 			if (c.ir + ux) > 0xFFF { // VF is set to 1 when range overflow (I+VX>0xFFF), and 0 when there isn't.
-				log.Infof("carr")
 				log.Debug("carrying the one")
 				c.v[0xF] = 1 // carry
 			} else {

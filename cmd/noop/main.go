@@ -10,7 +10,7 @@ import (
 
 func main() {
 	log.SetLevel(log.InfoLevel)
-	s := &noop.Screen{}
+	s := noop.NewScreen()
 	ctx, _ := context.WithCancel(context.Background())
 	c := cmd.GetCommand(ctx, s, cpu.NewKeyboard(), s)
 	if err := c.Execute(); err != nil {

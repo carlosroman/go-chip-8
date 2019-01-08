@@ -16,22 +16,42 @@ const (
 	ScreenWidth          = 64
 	ScreenHeight         = 32
 	defaultSixtyHz       = 60
-	defaultSOneHundredHz = 100
+	defaultSOneHundredHz = 18.2
 )
 
 func GetCommand(ctx context.Context, screen cpu.Screen, keyboard cpu.Keyboard, loop Loop) *cobra.Command {
 	var romPath string
-	timer := time.Second / defaultSixtyHz          // 60hz
-	cpuClock := time.Second / defaultSOneHundredHz // 100hz
+	timer := time.Second / defaultSixtyHz // 60hz
+	cpuClock := time.Second / 540         // 540hz
 	runCmd := &cobra.Command{
 		Use:   "chip8",
 		Short: "Chip8 is a Chip 8 emulator",
 		Long:  "Chip8 is a Chip 8 emulator",
 		//Args:  cobra.MinimumNArgs(1),
 		Run: func(cmd *cobra.Command, args []string) {
-			ti := cpu.NewTimer()
+			sc := make(chan byte, 60)
+			ti := cpu.NewTimer(sc)
 			wg := sync.WaitGroup{}
-			wg.Add(3)
+			s, err := newSoundCard()
+			if err != nil {
+				log.WithError(err).Fatal("Could not create sound card")
+			}
+			wg.Add(4)
+
+			go func(w *sync.WaitGroup) {
+				defer w.Done()
+				if err != nil {
+					log.WithError(err).Fatal("Could not create sound card")
+				}
+				go func() {
+					<-ctx.Done()
+					close(sc)
+				}()
+				if err = s.processSound(sc); err != nil {
+					log.WithError(err).Fatal("Sound card crashed")
+				}
+			}(&wg)
+
 			go func(w *sync.WaitGroup) {
 				defer w.Done()
 				log.Warn("Starting loop")
@@ -40,12 +60,14 @@ func GetCommand(ctx context.Context, screen cpu.Screen, keyboard cpu.Keyboard, l
 				}
 				log.Warn("Stopping loop")
 			}(&wg)
+
 			go func(w *sync.WaitGroup) {
 				defer wg.Done()
 				log.Warn("Starting timer")
 				ti.Start(ctx, timer)
 				log.Warn("Stopping timer")
 			}(&wg)
+
 			go func(w *sync.WaitGroup) {
 				defer w.Done()
 				m := state.InitMemory()
