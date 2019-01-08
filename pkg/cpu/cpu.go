@@ -70,16 +70,30 @@ func (c *cpu) Tick() (err error) {
 		// 0xDXYN, Disp, draw(Vx,Vy,N), Draws a sprite at coordinate (VX, VY) that has a width of 8 pixels and a height of N pixels. Each row of 8 pixels is read as bit-coded starting from memory location I; I value doesn’t change after the execution of this instruction. As described above, VF is set to 1 if any screen pixels are flipped from set to unset when the sprite is drawn, and to 0 if that doesn’t happen
 		log.Info("Opcode: DXYN")
 		x, y := getXY(opcode, c)
+		vx := uint16(c.v[x])
+		vy := uint16(c.v[y])
 		n := opcode & 0x000F
+		if log.IsLevelEnabled(log.DebugLevel) {
+			log.WithField("vx", vx).
+				WithField("vy", vy).
+				WithField("n", n).
+				Debug("About to draw sprite")
+		}
 		c.v[0xF] = 0x0
 		for yl := uint16(0); yl < n; yl++ {
 			px := c.m[c.ir+yl]
 			for xl := uint16(0); xl < 8; xl++ {
 				if px&(0x80>>xl) != 0 {
-					if c.fb[(x+xl+((y+yl)*64))] == 0x1 {
+					if log.IsLevelEnabled(log.DebugLevel) {
+						log.
+							WithField("xl", xl).
+							WithField("yl", yl).
+							Debugf("T:%v", vx+xl+((vy+yl)*64))
+					}
+					if c.fb[(vx+xl+((vy+yl)*64))] == 0x1 {
 						c.v[0xF] = 0x1
 					}
-					c.fb[x+xl+((y+yl)*64)] ^= 0x1
+					c.fb[vx+xl+((vy+yl)*64)] ^= 0x1
 				}
 			}
 		}

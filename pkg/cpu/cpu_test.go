@@ -50,7 +50,7 @@ func TestCpu_Tick_0x00E0(t *testing.T) {
 }
 
 func TestCpu_Tick_0xDXYN_no_collision(t *testing.T) {
-	bs := opCodeToBytes(0xD003)
+	bs := opCodeToBytes(0xD013)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
@@ -58,6 +58,8 @@ func TestCpu_Tick_0xDXYN_no_collision(t *testing.T) {
 	sm := &screenMock{}
 	c := getNewCPU(m, NewKeyboard(), NewTimer(), sm)
 	c.ir = uint16(55)
+	c.v[0] = 0x1 // vx
+	c.v[1] = 0x2 // vy
 	m[c.ir] = 0x03C
 	m[c.ir+1] = 0x0C3
 	m[c.ir+2] = 0x0FF
@@ -72,7 +74,7 @@ func TestCpu_Tick_0xDXYN_no_collision(t *testing.T) {
 }
 
 func TestCpu_Tick_0xDXYN_has_collision(t *testing.T) {
-	bs := opCodeToBytes(0xD003)
+	bs := opCodeToBytes(0xD023)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
 	err := m.LoadMemory(bf)
@@ -80,13 +82,15 @@ func TestCpu_Tick_0xDXYN_has_collision(t *testing.T) {
 	sm := &screenMock{}
 	c := getNewCPU(m, NewKeyboard(), NewTimer(), sm)
 	c.ir = uint16(55)
+	c.v[0] = 0x1 // vx
+	c.v[2] = 0x2 // vy
 	m[c.ir] = 0x03C
 	m[c.ir+1] = 0x0C3
 	m[c.ir+2] = 0x0FF
 
-	c.fb[2] = 0x1
+	c.fb[(64*(2+0))+1+2] = 0x1
 	fb := getExpectedFrameBuffer()
-	fb[2] = 0x0
+	fb[(64*(2+0))+1+2] = 0x0
 	sm.On("Draw", mock.Anything)
 	err = c.Tick()
 	assert.NoError(t, err)
@@ -96,26 +100,29 @@ func TestCpu_Tick_0xDXYN_has_collision(t *testing.T) {
 }
 
 func getExpectedFrameBuffer() []byte {
+	// given vx,vy is 1,2
+	vx := 1
+	vy := 2
 	fb := make([]byte, 64*32)
 	//0x3C   00111100     ****
-	fb[2] = 0x1
-	fb[3] = 0x1
-	fb[4] = 0x1
-	fb[5] = 0x1
+	fb[(64*(vy+0))+vx+2] = 0x1
+	fb[(64*(vy+0))+vx+3] = 0x1
+	fb[(64*(vy+0))+vx+4] = 0x1
+	fb[(64*(vy+0))+vx+5] = 0x1
 	//0xC3   11000011   **    **
-	fb[64+0] = 0x1
-	fb[64+1] = 0x1
-	fb[64+6] = 0x1
-	fb[64+7] = 0x1
+	fb[(64*(vy+1))+vx+0] = 0x1
+	fb[(64*(vy+1))+vx+1] = 0x1
+	fb[(64*(vy+1))+vx+6] = 0x1
+	fb[(64*(vy+1))+vx+7] = 0x1
 	//0xFF   11111111   ********
-	fb[64+64+0] = 0x1
-	fb[64+64+1] = 0x1
-	fb[64+64+2] = 0x1
-	fb[64+64+3] = 0x1
-	fb[64+64+4] = 0x1
-	fb[64+64+5] = 0x1
-	fb[64+64+6] = 0x1
-	fb[64+64+7] = 0x1
+	fb[(64*(vy+2))+vx+0] = 0x1
+	fb[(64*(vy+2))+vx+1] = 0x1
+	fb[(64*(vy+2))+vx+2] = 0x1
+	fb[(64*(vy+2))+vx+3] = 0x1
+	fb[(64*(vy+2))+vx+4] = 0x1
+	fb[(64*(vy+2))+vx+5] = 0x1
+	fb[(64*(vy+2))+vx+6] = 0x1
+	fb[(64*(vy+2))+vx+7] = 0x1
 	return fb
 }
 
