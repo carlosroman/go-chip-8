@@ -39,7 +39,7 @@ func Benchmark_BC_Chip8Test(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		m, err := getMemory(b)
 		c := getCPU(b, m)
-		for tc := 0; tc < 470; tc++ {
+		for tc := 0; tc < 250; tc++ { // only need 250 cycles to process all of BC_test.ch8
 			err = c.Tick()
 			assert.NoError(b, err)
 		}
