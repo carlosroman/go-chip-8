@@ -1,5 +1,5 @@
 Go CHIP-8 Emulator
-###########################
+==================
 
 [![GoDoc](https://godoc.org/github.com/carlosroman/go-chip-8?status.svg)](https://godoc.org/github.com/carlosroman/go-chip-8)
 [![Go Report Card](https://goreportcard.com/badge/github.com/carlosroman/go-chip-8)](https://goreportcard.com/report/github.com/carlosroman/go-chip-8)
