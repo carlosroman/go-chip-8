@@ -689,22 +689,22 @@ func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
 	assert.NoError(t, err)
 	c := getNewCPU(m, NewKeyboard(), NewTimer(), &screenMock{})
 	for i := range c.v {
-		c.v[i] = byte(i)
+		c.v[i] = byte(i + 1)
 	}
 	c.ir = uint16(222)
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
-	assert.Equal(t, uint16(9+222+1), c.ir)
+	assert.Equal(t, uint16(222), c.ir) // I itself is left unmodified
 
 	for i := 0; i < 10; i++ {
 		log.WithField("m[x]", 222+i).WithField("vi", c.v[i]).Debug("checking memory")
 		assert.Equal(t, c.v[i], m[222+i])
 	}
-	assert.Equal(t, uint8(0x0), m[c.ir]) // check current pointer to ir blank
+	assert.Equal(t, uint8(0x0), m[int16(9+222+1)]) // check memory blank after ir
 }
 
-func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
+func TestCpu_Tick_0xFX65_reg_load(t *testing.T) {
 	bs := opCodeToBytes(0xf965)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -721,7 +721,7 @@ func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
 	err = c.Tick()
 	assert.NoError(t, err)
 	assert.Equal(t, int16(514), c.pc)
-	assert.Equal(t, uint16(9+222+1), c.ir)
+	assert.Equal(t, uint16(222), c.ir) // I itself is left unmodified
 
 	for i := 0; i < 10; i++ {
 		log.WithField("m[x]", 222+i).WithField("vi", c.v[i]).Debug("checking memory")
@@ -731,7 +731,7 @@ func TestCpu_Tick_0xFX55_reg_load(t *testing.T) {
 	for i := 10; i < len(c.v); i++ { // check other Vs still have old value
 		assert.Equal(t, c.v[i], byte(i))
 	}
-	assert.Equal(t, uint8(0x0), m[c.ir]) // check current pointer to ir blank
+	assert.Equal(t, uint8(0x0), m[int16(9+222+1)]) // check memory blank after ir
 }
 
 func TestCpu_Tick_0xFX33(t *testing.T) {
