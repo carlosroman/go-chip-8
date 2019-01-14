@@ -1,6 +1,6 @@
 .DEFAULT_GOAL := test
 
-.PHONY: build test clean info fmt
+.PHONY: build test test-ci clean info fmt
 
 test-clean: clean
 	@mkdir -p target
@@ -10,6 +10,9 @@ test: test-clean
 	    -v \
 	    -race \
 	    ./...
+
+test-ci: test-clean
+	@scripts/coverage.sh
 
 clean:
 	@rm -rf target

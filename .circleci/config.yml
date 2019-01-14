@@ -13,4 +13,6 @@ jobs:
       - checkout
 
       # specify any bash command here prefixed with `run: `
-      - run: make test
+      - run: chmod +x scripts/coverage.sh
+      - run: make test-ci
+      - run: bash <(curl -s https://codecov.io/bash)
