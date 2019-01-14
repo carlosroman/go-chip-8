@@ -137,7 +137,7 @@ func TestCpu_Tick_0x00EE(t *testing.T) {
 	c.stack.Push(exp)
 	err = c.Tick()
 	assert.NoError(t, err)
-	assert.Equal(t, exp, c.pc)
+	assert.Equal(t, exp+2, c.pc) // return and move on
 }
 
 func TestCpu_Tick_0xANNN(t *testing.T) {

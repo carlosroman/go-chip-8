@@ -38,7 +38,6 @@ func (c *cpu) Tick() (err error) {
 				c.fb[i] = byte(0x0)
 			}
 			c.s.Draw(c.fb)
-			c.pc += 2
 		case 0x00EE:
 			// 0x00EE, Flow, return;, Returns from a subroutine.
 			log.Info("Opcode: 00EE")
@@ -46,6 +45,7 @@ func (c *cpu) Tick() (err error) {
 		default:
 			log.Warnf("Unknown opcode [0x0000]: %#04x:%#04x\n", val, sub)
 		}
+		c.pc += 2
 	case 0xA000:
 		// 0xANNN, MEM, I = NNN, Sets I to the address NNN.
 		log.Info("Opcode: 0xANNN")
