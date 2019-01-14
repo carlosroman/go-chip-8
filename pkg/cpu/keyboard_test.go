@@ -8,10 +8,15 @@ import (
 	"testing"
 )
 
+func init() {
+	log.SetLevel(log.DebugLevel)
+}
+
 func TestKeyboard_isKeyPressed(t *testing.T) {
 	k := NewKeyboard()
 	k.KeyPressed(0xa)
 	assert.True(t, k.IsKeyPressed(0xa))
+	k.KeyPressed(0xb) // Should not block
 }
 
 func TestKeyboard_waitForKeyPressed(t *testing.T) {
@@ -30,4 +35,12 @@ func TestKeyboard_waitForKeyPressed(t *testing.T) {
 	log.Info("checking key")
 	assert.True(t, k.IsKeyPressed(0xb))
 	assert.Equal(t, byte(0xb), key)
+}
+
+func TestKeyboard_Clear(t *testing.T) {
+	k := NewKeyboard()
+	k.KeyPressed(0x1)
+	k.Clear()
+	assert.False(t, k.IsKeyPressed(0x1))
+	k.KeyPressed(0x1) // Should not block
 }

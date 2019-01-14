@@ -841,6 +841,10 @@ func (k *keyboardMock) IsKeyPressed(key byte) bool {
 	return args.Bool(0)
 }
 
+func (k *keyboardMock) Clear() {
+	k.Called()
+}
+
 type screenMock struct {
 	mock.Mock
 }
