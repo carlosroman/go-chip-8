@@ -761,14 +761,25 @@ func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 		vx     uint8
 		ir     uint16
 		expIr  uint16
+		cry    uint8
 	}{
 		{
-			name:   "FX1E",
+			name:   "FX1E no carry",
 			opcode: 0xfa1e,
 			x:      10,
 			vx:     12, // 0x0c
 			ir:     121,
 			expIr:  12 + 121,
+			cry:    0x0,
+		},
+		{
+			name:   "FX1E carry the one",
+			opcode: 0xfa1e,
+			x:      10,
+			vx:     200,
+			ir:     3975,
+			expIr:  200 + 3975,
+			cry:    0x1,
 		},
 		{
 			name:   "FX29",
@@ -777,6 +788,7 @@ func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 			vx:     12, // 0x0c
 			ir:     121,
 			expIr:  12 * 5, // 0x0c * 0X5 (font starts hex x 5)
+			cry:    0x0,
 		},
 	}
 	for _, tc := range testCases {
@@ -793,6 +805,7 @@ func TestCpu_Tick_0xFX_MEM(t *testing.T) {
 			assert.NoError(t, err)
 			assert.Equal(t, int16(514), c.pc)
 			assert.Equal(t, tc.expIr, c.ir)
+			assert.Equal(t, tc.cry, c.v[15], "No one to carry over or borrow")
 		})
 	}
 }

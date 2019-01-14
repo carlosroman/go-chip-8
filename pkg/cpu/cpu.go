@@ -280,7 +280,15 @@ func (c *cpu) Tick() (err error) {
 			// 0xFX1E, MEM, I +=Vx 	Adds VX to I.
 			log.Info("Opcode: FX1E")
 			x := getX(opcode)
-			c.ir += uint16(c.v[x])
+			ux := uint16(c.v[x])
+			if (c.ir + ux) > 0xFFF { // VF is set to 1 when range overflow (I+VX>0xFFF), and 0 when there isn't.
+				log.Infof("carr")
+				log.Debug("carrying the one")
+				c.v[0xF] = 1 // carry
+			} else {
+				c.v[0xF] = 0
+			}
+			c.ir += ux
 		case 0x0029:
 			// 0xFX29, MEM, I=sprite_addr[Vx], Sets I to the location of the sprite for the character in VX. Characters 0-F (in hexadecimal) are represented by a 4x5 font.
 			log.Info("Opcode: FX29")
