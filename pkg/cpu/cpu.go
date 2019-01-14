@@ -48,17 +48,17 @@ func (c *cpu) Tick() (err error) {
 		c.pc += 2
 	case 0xA000:
 		// 0xANNN, MEM, I = NNN, Sets I to the address NNN.
-		log.Info("Opcode: 0xANNN")
+		log.Info("Opcode: ANNN")
 		c.ir = opcode & 0x0FFF
 		c.pc += 2
 	case 0xB000:
 		// 0xBNNN, Flow, PC=V0+NNN , Jumps to the address NNN plus V0.
-		log.Info("Opcode: 0xBNNN")
+		log.Info("Opcode: BNNN")
 		nnn := opcode & 0x0FFF
 		c.pc = int16(c.v[0]) + int16(nnn)
 	case 0xC000:
 		// 0xCXNN, Rand, Vx=rand()&NN, Sets VX to the result of a bitwise and operation on a random number (Typically: 0 to 255) and NN.
-		log.Info("Opcode: 0xCXNN")
+		log.Info("Opcode: CXNN")
 		r := c.r.Intn(256)
 		x := getX(opcode)
 		bs := make([]byte, 2)
@@ -160,27 +160,27 @@ func (c *cpu) Tick() (err error) {
 		switch sub := opcode & 0x000F; sub {
 		case 0x0000:
 			// 0x8XY0, Assign, Vx=Vy, Sets VX to the value of VY.
-			log.Info("Opcode: 0x8XY0")
+			log.Info("Opcode: 8XY0")
 			x, y := getXY(opcode, c)
 			c.v[x] = c.v[y]
 		case 0x0001:
 			// 0x8XY1, BitOp, Vx=Vx|Vy, Sets VX to VX or VY. (Bitwise OR operation)
-			log.Info("Opcode: 0x8XY1")
+			log.Info("Opcode: 8XY1")
 			x, y := getXY(opcode, c)
 			c.v[x] |= c.v[y]
 		case 0x0002:
 			// 0x8XY2, BitOp, Vx=Vx&Vy, Sets VX to VX and VY. (Bitwise AND operation)
-			log.Info("Opcode: 0x8XY2")
+			log.Info("Opcode: 8XY2")
 			x, y := getXY(opcode, c)
 			c.v[x] &= c.v[y]
 		case 0x0003:
 			// 0x8XY3, BitOp, Vx=Vx^Vy, Sets VX to VX xor VY.
-			log.Info("Opcode: 0x8XY3")
+			log.Info("Opcode: 8XY3")
 			x, y := getXY(opcode, c)
 			c.v[x] ^= c.v[y]
 		case 0x0004:
 			// 0x8XY4, Math, Vx += Vy , Adds VY to VX. VF is set to 1 when there's a carry, and to 0 when there isn't.
-			log.Info("Opcode: 0x8XY4")
+			log.Info("Opcode: 8XY4")
 			x, y := getXY(opcode, c)
 			if c.v[y] > (0xFF - c.v[x]) {
 				log.Debug("carrying the one")
@@ -191,7 +191,7 @@ func (c *cpu) Tick() (err error) {
 			c.v[x] += c.v[y]
 		case 0x0005:
 			// 0x8XY5, Math, Vx -= Vy, VY is subtracted from VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
-			log.Info("Opcode: 0x8XY5")
+			log.Info("Opcode: 8XY5")
 			x, y := getXY(opcode, c)
 			if c.v[y] > c.v[x] {
 				log.Debug("borrowing")
@@ -202,13 +202,13 @@ func (c *cpu) Tick() (err error) {
 			c.v[x] -= c.v[y]
 		case 0x0006:
 			// 0x8XY6, BitOp, Vx>>=1, Stores the least significant bit of VX in VF and then shifts VX to the right by 1.
-			log.Info("Opcode: 0x8XY6")
+			log.Info("Opcode: 8XY6")
 			x, _ := getXY(opcode, c)
 			c.v[0xF] = c.v[x] & 0x1
 			c.v[x] >>= 1
 		case 0x0007:
 			// 0x8XY7, Math, Vx=Vy-Vx, Sets VX to VY minus VX. VF is set to 0 when there's a borrow, and 1 when there isn't.
-			log.Info("Opcode: 0x8XY7")
+			log.Info("Opcode: 8XY7")
 			x, y := getXY(opcode, c)
 			if c.v[x] > c.v[y] {
 				log.Debug("borrowing")
@@ -219,7 +219,7 @@ func (c *cpu) Tick() (err error) {
 			c.v[x] = c.v[y] - c.v[x]
 		case 0x000E:
 			// 0x8XYE, BitOp, Vx<<=1, Stores the most significant bit of VX in VF and then shifts VX to the left by 1.
-			log.Info("Opcode: 0x8XYE")
+			log.Info("Opcode: 8XYE")
 			x, _ := getXY(opcode, c)
 			c.v[0xF] = c.v[x] >> 7
 			c.v[x] <<= 1
