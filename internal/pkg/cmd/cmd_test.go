@@ -5,6 +5,7 @@ import (
 	"github.com/carlosroman/go-chip-8/pkg/cpu"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"sync"
 	"testing"
 	"time"
@@ -16,7 +17,11 @@ const (
 
 func TestGetCommand(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
-	c := GetCommand(ctx, &noopScreen{}, cpu.NewKeyboard(), &ctxLoop{})
+	c := GetCommand(ctx, &noopScreen{}, cpu.NewKeyboard(), &ctxLoop{}, func() (ap AudioPlayer, err error) {
+		m := mockAudioPlayer{}
+		m.On("ProcessSound", mock.Anything).Return(nil)
+		return &m, nil
+	})
 	c.SetArgs([]string{"--rom", bcChip8TestPath})
 	var wg sync.WaitGroup
 	wg.Add(2)
@@ -50,4 +55,13 @@ type ctxLoop struct {
 func (l *ctxLoop) Run(ctx context.Context) error {
 	<-ctx.Done()
 	return l.err
+}
+
+type mockAudioPlayer struct {
+	mock.Mock
+}
+
+func (m *mockAudioPlayer) ProcessSound(soundChan <-chan byte) (err error) {
+	args := m.Called(soundChan)
+	return args.Error(0)
 }

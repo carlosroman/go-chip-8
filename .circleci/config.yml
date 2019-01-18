@@ -11,7 +11,9 @@ jobs:
 
     steps:
       - checkout
-
+      - run:
+          name: Install System Dependencies
+          command: sudo apt-get update && sudo apt-get install -y libasound2-dev
       # specify any bash command here prefixed with `run: `
       - run: chmod +x scripts/coverage.sh
       - run: make test-ci

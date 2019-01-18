@@ -9,13 +9,18 @@ import (
 )
 
 type timer struct {
-	lock  sync.RWMutex
-	delay byte
-	sound byte
+	lock      sync.RWMutex
+	delay     byte
+	sound     byte
+	soundChan chan<- byte
 }
 
-func NewTimer() *timer {
-	return &timer{}
+func NewTimer(soundChan chan<- byte) *timer {
+	return &timer{
+		delay:     0,
+		sound:     0,
+		soundChan: soundChan,
+	}
 }
 
 func (t *timer) SetDelay(val byte) {
@@ -52,6 +57,7 @@ func (t *timer) tick() (err error) {
 	if t.sound > 0 {
 		t.sound -= 1
 	}
+	t.soundChan <- t.sound
 	return err
 }
 
@@ -61,6 +67,7 @@ func (t *timer) Start(ctx context.Context, duration time.Duration) {
 
 func Start(name string, ctx context.Context, d time.Duration, tick func() error) {
 	limit := rate.Every(d)
+	log.WithField("name", name).WithField("d", d).WithField("limit", limit).Info("Starting timer")
 	limiter := rate.NewLimiter(limit, 1)
 	for {
 		err := limiter.Wait(ctx)

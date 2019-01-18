@@ -12,8 +12,20 @@ func main() {
 	log.SetLevel(log.InfoLevel)
 	s := &noop.Screen{}
 	ctx, _ := context.WithCancel(context.Background())
-	c := cmd.GetCommand(ctx, s, cpu.NewKeyboard(), s)
+	c := cmd.GetCommand(ctx, s, cpu.NewKeyboard(), s, func() (ap cmd.AudioPlayer, err error) {
+		return &audioPlayer{}, nil
+	})
 	if err := c.Execute(); err != nil {
 		log.WithError(err).Fatal("app crashed")
 	}
+}
+
+type audioPlayer struct {
+}
+
+func (n *audioPlayer) ProcessSound(soundChan <-chan byte) (err error) {
+	for i := range soundChan {
+		log.Debug(i)
+	}
+	return err
 }
