@@ -63,5 +63,8 @@ type mockAudioPlayer struct {
 
 func (m *mockAudioPlayer) ProcessSound(soundChan <-chan byte) (err error) {
 	args := m.Called(soundChan)
+	for i := range soundChan {
+		log.Debug(i)
+	}
 	return args.Error(0)
 }
