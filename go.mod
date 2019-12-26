@@ -9,3 +9,5 @@ require (
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/time v0.0.0-20181108054448-85acf8d2951c
 )
+
+go 1.12

@@ -14,6 +14,7 @@ func init() {
 }
 
 func TestTimer_SetDelay(t *testing.T) {
+	t.Parallel()
 	ti, _ := setupTimer()
 	assert.NotNil(t, ti)
 	ti.SetDelay(0xaf)
@@ -21,6 +22,7 @@ func TestTimer_SetDelay(t *testing.T) {
 }
 
 func TestTimer_SetSound(t *testing.T) {
+	t.Parallel()
 	ti, _ := setupTimer()
 	assert.NotNil(t, ti)
 	ti.SetSound(0xaa)
@@ -33,10 +35,11 @@ func TestTimer_Start(t *testing.T) {
 	ti.SetDelay(0x33) // 51
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := sync.WaitGroup{}
-	wg.Add(1)
+	wg.Add(3)
 
 	go func() {
 		ti.Start(ctx, time.Second/60)
+		t.Log("ti.Start(ctx, time.Second/60)")
 		wg.Done()
 	}()
 
@@ -48,6 +51,8 @@ func TestTimer_Start(t *testing.T) {
 			case <-s:
 				count++
 			case <-c.Done():
+				t.Log("c.Done()")
+				wg.Done()
 				r <- count
 				return
 			}
@@ -57,7 +62,10 @@ func TestTimer_Start(t *testing.T) {
 	go func() {
 		<-time.After(300 * time.Millisecond) // allow about 18 ticks
 		cancel()
+		t.Log("cancel()")
+		wg.Done()
 	}()
+
 	wg.Wait()
 	ticks := <-resChan
 	assert.Equal(t, byte(0x0), ti.GetSound(), "should stop at zero")
