@@ -14,6 +14,7 @@ func init() {
 }
 
 func TestPrintDump(t *testing.T) {
+	t.Parallel()
 	m := loadMemoryTest(t)
 
 	for i := range m {

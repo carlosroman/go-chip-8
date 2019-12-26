@@ -19,12 +19,14 @@ const (
 )
 
 func TestInitMemory(t *testing.T) {
+	t.Parallel()
 	m := InitMemory()
 	assert.NotNil(t, m)
 	assert.Len(t, m, 4096)
 }
 
 func TestLoadMemory(t *testing.T) {
+	t.Parallel()
 	m := loadMemoryTest(t)
 	hash := sha256.Sum256(m)
 	assert.Equal(t,
@@ -46,12 +48,14 @@ func loadMemoryTest(tb testing.TB) Memory {
 }
 
 func TestInitStack(t *testing.T) {
+	t.Parallel()
 	s := InitStack()
 	assert.NotNil(t, s)
 	assert.Len(t, s.s, 16)
 }
 
 func TestStack_PushThenPop(t *testing.T) {
+	t.Parallel()
 	s := InitStack()
 	ex := int16(1337)
 	for i := int16(0); i < 16; i++ {

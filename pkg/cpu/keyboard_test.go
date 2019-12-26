@@ -13,6 +13,7 @@ func init() {
 }
 
 func TestKeyboard_isKeyPressed(t *testing.T) {
+	t.Parallel()
 	k := NewKeyboard()
 	k.KeyPressed(0xa)
 	assert.True(t, k.IsKeyPressed(0xa))
@@ -20,6 +21,7 @@ func TestKeyboard_isKeyPressed(t *testing.T) {
 }
 
 func TestKeyboard_waitForKeyPressed(t *testing.T) {
+	t.Parallel()
 	k := NewKeyboard()
 	wg := sync.WaitGroup{}
 	wg.Add(1)
@@ -38,6 +40,7 @@ func TestKeyboard_waitForKeyPressed(t *testing.T) {
 }
 
 func TestKeyboard_Clear(t *testing.T) {
+	t.Parallel()
 	k := NewKeyboard()
 	k.KeyPressed(0x1)
 	k.Clear()

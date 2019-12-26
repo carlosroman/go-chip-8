@@ -30,6 +30,7 @@ func TestTimer_SetSound(t *testing.T) {
 }
 
 func TestTimer_Start(t *testing.T) {
+	t.Parallel()
 	ti, sc := setupTimer()
 	ti.SetSound(0x0d) // 13
 	ti.SetDelay(0x33) // 51

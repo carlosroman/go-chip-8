@@ -9,6 +9,7 @@ import (
 )
 
 func TestSoundCard(t *testing.T) {
+	t.Parallel()
 	b := []byte{0x0, 0x1, 0x2}
 	w := &mockWriter{}
 	s := newSoundCard(b, w)
@@ -30,6 +31,7 @@ func TestSoundCard(t *testing.T) {
 }
 
 func TestSoundCard_error(t *testing.T) {
+	t.Parallel()
 	b := []byte{0x0, 0x1, 0x2}
 	w := &mockWriter{}
 	s := newSoundCard(b, w)
@@ -52,6 +54,7 @@ func TestSoundCard_error(t *testing.T) {
 }
 
 func TestGenerateSample(t *testing.T) {
+	t.Parallel()
 	a := generateSample()
 	assert.Len(t, a, bufferSize)
 	// TODO: Find a nice way to validate `a`

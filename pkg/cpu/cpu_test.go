@@ -18,6 +18,7 @@ func init() {
 }
 
 func TestNewCPU(t *testing.T) {
+	t.Parallel()
 	m := make(state.Memory, 512+10)
 	bf := bytes.NewBuffer([]byte{8})
 	fmt.Println(bf.Len())
@@ -29,6 +30,7 @@ func TestNewCPU(t *testing.T) {
 }
 
 func TestCpu_Tick_0x00E0(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0x00E0)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -50,6 +52,7 @@ func TestCpu_Tick_0x00E0(t *testing.T) {
 }
 
 func TestCpu_Tick_0xDXYN_no_collision(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xD013)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -79,6 +82,7 @@ func getTimer() (ti *timer) {
 }
 
 func TestCpu_Tick_0xDXYN_has_collision(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xD023)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -132,6 +136,7 @@ func getExpectedFrameBuffer() []byte {
 }
 
 func TestCpu_Tick_0x00EE(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0x00EE)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -146,6 +151,7 @@ func TestCpu_Tick_0x00EE(t *testing.T) {
 }
 
 func TestCpu_Tick_0xANNN(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xa2F0)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -159,6 +165,7 @@ func TestCpu_Tick_0xANNN(t *testing.T) {
 }
 
 func TestCpu_Tick_0xBNNN(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xb2F0)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -172,6 +179,7 @@ func TestCpu_Tick_0xBNNN(t *testing.T) {
 }
 
 func TestCpu_Tick_0xCXN(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xCAF0)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -185,6 +193,7 @@ func TestCpu_Tick_0xCXN(t *testing.T) {
 }
 
 func TestCpu_Tick_0x1NNN(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0x14ef)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -197,6 +206,7 @@ func TestCpu_Tick_0x1NNN(t *testing.T) {
 }
 
 func TestCpu_Tick_0x2NNN(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0x24ef)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -211,6 +221,7 @@ func TestCpu_Tick_0x2NNN(t *testing.T) {
 }
 
 func TestCpu_Tick_0x3XNN(t *testing.T) {
+	t.Parallel()
 	var testCases = []struct {
 		name   string
 		opcode uint16
@@ -250,6 +261,7 @@ func TestCpu_Tick_0x3XNN(t *testing.T) {
 }
 
 func TestCpu_Tick_0x4XNN(t *testing.T) {
+	t.Parallel()
 	var testCases = []struct {
 		name   string
 		opcode uint16
@@ -289,6 +301,7 @@ func TestCpu_Tick_0x4XNN(t *testing.T) {
 }
 
 func TestCpu_Tick_0x5XY0(t *testing.T) {
+	t.Parallel()
 	var testCases = []struct {
 		name   string
 		opcode uint16
@@ -335,6 +348,7 @@ func TestCpu_Tick_0x5XY0(t *testing.T) {
 }
 
 func TestCpu_Tick_0x9XY0(t *testing.T) {
+	t.Parallel()
 	var testCases = []struct {
 		name   string
 		opcode uint16
@@ -381,6 +395,7 @@ func TestCpu_Tick_0x9XY0(t *testing.T) {
 }
 
 func TestCpu_Tick_0x6XNN(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0x64ee)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -394,6 +409,7 @@ func TestCpu_Tick_0x6XNN(t *testing.T) {
 }
 
 func TestCpu_Tick_0x7XNN(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0x741f)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -408,6 +424,7 @@ func TestCpu_Tick_0x7XNN(t *testing.T) {
 }
 
 func TestCpu_Tick_0x8(t *testing.T) {
+	t.Parallel()
 	var testCases = []struct {
 		name   string
 		opcode uint16
@@ -562,6 +579,7 @@ func TestCpu_Tick_0x8(t *testing.T) {
 }
 
 func TestCpu_Tick_0xEX(t *testing.T) {
+	t.Parallel()
 	var testCases = []struct {
 		name         string
 		opcode       uint16
@@ -624,6 +642,7 @@ func TestCpu_Tick_0xEX(t *testing.T) {
 }
 
 func TestCpu_Tick_0xFX07(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xf907)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -639,6 +658,7 @@ func TestCpu_Tick_0xFX07(t *testing.T) {
 }
 
 func TestCpu_Tick_0xFX0A(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xf90a)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -655,6 +675,7 @@ func TestCpu_Tick_0xFX0A(t *testing.T) {
 }
 
 func TestCpu_Tick_0xFX15(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xf915)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -671,6 +692,7 @@ func TestCpu_Tick_0xFX15(t *testing.T) {
 }
 
 func TestCpu_Tick_0xFX18(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xf918)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -687,6 +709,7 @@ func TestCpu_Tick_0xFX18(t *testing.T) {
 }
 
 func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xf955)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -710,6 +733,7 @@ func TestCpu_Tick_0xFX55_reg_dump(t *testing.T) {
 }
 
 func TestCpu_Tick_0xFX65_reg_load(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xf965)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -740,6 +764,7 @@ func TestCpu_Tick_0xFX65_reg_load(t *testing.T) {
 }
 
 func TestCpu_Tick_0xFX33(t *testing.T) {
+	t.Parallel()
 	bs := opCodeToBytes(0xfb33)
 	m := state.InitMemory()
 	bf := bytes.NewBuffer(bs)
@@ -759,6 +784,7 @@ func TestCpu_Tick_0xFX33(t *testing.T) {
 }
 
 func TestCpu_Tick_0xFX_MEM(t *testing.T) {
+	t.Parallel()
 	var testCases = []struct {
 		name   string
 		opcode uint16
