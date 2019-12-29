@@ -13,7 +13,18 @@ jobs:
       - checkout
       - run:
           name: Install System Dependencies
-          command: sudo apt-get update && sudo apt-get install -y libasound2-dev
+          command: |
+            sudo apt-get update \
+            && sudo apt-get install -y \
+              libasound2-dev \
+              libglew-dev \
+              libgles2-mesa-dev \
+              libalut-dev \
+              libxcursor-dev \
+              libxi-dev \
+              libxinerama-dev \
+              libxrandr-dev \
+              libxxf86vm-dev
       # specify any bash command here prefixed with `run: `
       - run: chmod +x scripts/coverage.sh
       - run: make test-ci
