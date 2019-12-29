@@ -19,7 +19,13 @@ const (
 	defaultSOneHundredHz = 100
 )
 
-func GetCommand(ctx context.Context, screen cpu.Screen, keyboard cpu.Keyboard, loop Loop, getSoundCard func() (ap AudioPlayer, err error)) *cobra.Command {
+func GetCommand(
+	ctx context.Context,
+	screen cpu.Screen,
+	keyboard cpu.Keyboard,
+	loop Loop,
+	getSoundCard func() (ap AudioPlayer, err error)) *cobra.Command {
+
 	var romPath string
 	timer := time.Second / defaultSixtyHz          // 60hz
 	cpuClock := time.Second / defaultSOneHundredHz // 100hz
@@ -36,52 +42,48 @@ func GetCommand(ctx context.Context, screen cpu.Screen, keyboard cpu.Keyboard, l
 			if err != nil {
 				log.WithError(err).Fatal("Could not create sound card")
 			}
-			wg.Add(4)
+			wg.Add(3)
 
 			go func(w *sync.WaitGroup) {
 				defer w.Done()
-				if err != nil {
-					log.WithError(err).Fatal("Could not create sound card")
-				}
 				go func() {
 					<-ctx.Done()
 					close(sc)
 				}()
-				if err = s.ProcessSound(sc); err != nil {
-					log.WithError(err).Fatal("Sound card crashed")
+				if errSound := s.ProcessSound(sc); errSound != nil {
+					log.WithError(errSound).Fatal("Sound card crashed")
 				}
 			}(&wg)
 
-			go func(w *sync.WaitGroup) {
-				defer w.Done()
-				log.Warn("Starting loop")
-				if err := loop.Run(ctx); err != nil {
-					log.WithError(err).Fatal("Loop failed")
-				}
-				log.Warn("Stopping loop")
-			}(&wg)
 			go func(w *sync.WaitGroup) {
 				defer wg.Done()
 				log.Warn("Starting timer")
 				ti.Start(ctx, timer)
 				log.Warn("Stopping timer")
 			}(&wg)
+
 			go func(w *sync.WaitGroup) {
 				defer w.Done()
 				m := state.InitMemory()
-				f, err := os.Open(romPath)
-				if err != nil {
-					log.WithError(err).Panicf("Could not open file '%s'", romPath)
+				f, errMemory := os.Open(romPath)
+				if errMemory != nil {
+					log.WithError(errMemory).Panicf("Could not open file '%s'", romPath)
 				}
-				err = m.LoadMemory(f)
-				if err != nil {
-					log.WithError(err).Panicf("Could not load memory with file '%s'", romPath)
+				errMemory = m.LoadMemory(f)
+				if errMemory != nil {
+					log.WithError(errMemory).Panicf("Could not load memory with file '%s'", romPath)
 				}
 				s := rand.NewSource(time.Now().UnixNano())
 				r := rand.New(s)
 				c := cpu.NewCPU(m, r, keyboard, ti, screen)
 				cpu.Start("cpu", ctx, cpuClock, c.Tick)
 			}(&wg)
+
+			// Main loop has to run as part of main thread or else most graphics libraries fail
+			errMain := loop.Run(ctx)
+			if errMain != nil {
+				log.WithError(errMain).Fatal("Loop failed")
+			}
 			wg.Wait()
 		},
 	}
