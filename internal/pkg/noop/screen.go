@@ -28,9 +28,9 @@ func (s *Screen) Refresh() error {
 	return nil
 }
 
-func (n *Screen) Run(ctx context.Context) error {
+func (s *Screen) Run(ctx context.Context) error {
 	go func() {
-		cpu.Start("loop", ctx, time.Second, n.Refresh)
+		cpu.Start("loop", ctx, time.Second, s.Refresh)
 	}()
 	<-ctx.Done()
 	return nil
