@@ -1,0 +1,21 @@
+---
+on: [push]
+
+name: Unit Test
+
+jobs:
+  build:
+    runs-on: ubuntu-20.04
+    strategy:
+      matrix:
+        go: [ '1.12.x', '1.13.x', '1.14.x' ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup header files
+        run: sudo apt-get install --no-install-recommends -y libasound2-dev
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ matrix.go }}
+      - name: Running unit tests
+        run: make dep test

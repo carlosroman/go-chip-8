@@ -1,6 +1,9 @@
 .DEFAULT_GOAL := test
 
-.PHONY: build test test-ci clean info fmt
+.PHONY: build test test-ci clean info fmt dep
+
+dep:
+	@go mod vendor
 
 test-clean: clean
 	@mkdir -p target
