@@ -2,6 +2,11 @@
 
 .PHONY: build test test-ci clean info fmt dep
 
+TEST_PATTERN ?=.
+TEST_OPTIONS ?=
+TEST_FLAGS += -failfast
+TEST_FLAGS += -race
+
 dep:
 	@go mod vendor
 
@@ -10,9 +15,11 @@ test-clean: clean
 
 test: test-clean
 	@go test \
-	    -v \
-	    -race \
-	    ./...
+	     $(TEST_OPTIONS) \
+	     $(TEST_FLAGS) \
+	    ./... \
+	    -run $(TEST_PATTERN) \
+	    -timeout=3m
 
 test-ci: test-clean
 	@scripts/coverage.sh
