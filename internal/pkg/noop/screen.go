@@ -30,7 +30,7 @@ func (s *Screen) Refresh() error {
 
 func (s *Screen) Run(ctx context.Context) error {
 	go func() {
-		cpu.Start("loop", ctx, time.Second, s.Refresh)
+		cpu.Start(ctx, "loop", time.Second, s.Refresh)
 	}()
 	<-ctx.Done()
 	return nil

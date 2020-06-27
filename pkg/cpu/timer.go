@@ -63,10 +63,10 @@ func (t *timer) tick() (err error) {
 }
 
 func (t *timer) Start(ctx context.Context, duration time.Duration) {
-	Start("timer", ctx, duration, t.tick)
+	Start(ctx, "timer", duration, t.tick)
 }
 
-func Start(name string, ctx context.Context, d time.Duration, tick func() error) {
+func Start(ctx context.Context, name string, d time.Duration, tick func() error) {
 	limit := rate.Every(d)
 	log.WithField("name", name).WithField("d", d).WithField("limit", limit).Info("Starting timer")
 	limiter := rate.NewLimiter(limit, 1)

@@ -81,7 +81,7 @@ func GetCommand(ctx context.Context, screen cpu.Screen, keyboard cpu.Keyboard, l
 				s := rand.NewSource(time.Now().UnixNano())
 				r := rand.New(s)
 				c := cpu.NewCPU(m, r, keyboard, ti, screen)
-				cpu.Start("cpu", ctx, cpuClock, c.Tick)
+				cpu.Start(ctx, "cpu", cpuClock, c.Tick)
 			}(&wg)
 			wg.Wait()
 		},
