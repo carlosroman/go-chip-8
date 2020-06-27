@@ -53,10 +53,10 @@ func (t *timer) tick() (err error) {
 	t.lock.Lock()
 	defer t.lock.Unlock()
 	if t.delay > 0 {
-		t.delay -= 1
+		t.delay--
 	}
 	if t.sound > 0 {
-		t.sound -= 1
+		t.sound--
 	}
 	t.soundChan <- t.sound
 	return err
