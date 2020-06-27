@@ -1,10 +1,11 @@
 package state
 
 import (
-	log "github.com/sirupsen/logrus"
 	"io"
 	"io/ioutil"
 	"sync"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func getFonts() []byte {

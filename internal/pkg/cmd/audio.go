@@ -1,10 +1,11 @@
 package cmd
 
 import (
-	"github.com/hajimehoshi/oto"
-	log "github.com/sirupsen/logrus"
 	"io"
 	"math"
+
+	"github.com/hajimehoshi/oto"
+	log "github.com/sirupsen/logrus"
 )
 
 const (

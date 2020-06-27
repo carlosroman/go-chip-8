@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+
 	"github.com/carlosroman/go-chip-8/internal/pkg/cmd"
 	"github.com/carlosroman/go-chip-8/internal/pkg/noop"
 	"github.com/carlosroman/go-chip-8/pkg/cpu"

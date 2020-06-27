@@ -1,11 +1,12 @@
 package cpu
 
 import (
+	"os"
+	"testing"
+
 	"github.com/carlosroman/go-chip-8/pkg/state"
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"os"
-	"testing"
 )
 
 const (

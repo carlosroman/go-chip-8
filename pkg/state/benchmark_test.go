@@ -3,9 +3,10 @@ package state
 import (
 	"crypto/sha256"
 	"fmt"
+	"testing"
+
 	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
-	"testing"
 )
 
 func BenchmarkLoadMemory(b *testing.B) {

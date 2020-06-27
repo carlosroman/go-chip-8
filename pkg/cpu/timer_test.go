@@ -2,11 +2,12 @@ package cpu
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
-	"github.com/stretchr/testify/assert"
 	"sync"
 	"testing"
 	"time"
+
+	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 )
 
 func init() {

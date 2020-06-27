@@ -2,10 +2,11 @@ package noop
 
 import (
 	"context"
-	"github.com/carlosroman/go-chip-8/pkg/cpu"
-	log "github.com/sirupsen/logrus"
 	"sync"
 	"time"
+
+	"github.com/carlosroman/go-chip-8/pkg/cpu"
+	log "github.com/sirupsen/logrus"
 )
 
 type Screen struct {

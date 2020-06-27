@@ -3,9 +3,10 @@ package cpu
 import (
 	"encoding/binary"
 	"fmt"
+	"math/rand"
+
 	"github.com/carlosroman/go-chip-8/pkg/state"
 	log "github.com/sirupsen/logrus"
-	"math/rand"
 )
 
 type cpu struct {

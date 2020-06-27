@@ -2,14 +2,15 @@ package cmd
 
 import (
 	"context"
-	"github.com/carlosroman/go-chip-8/pkg/cpu"
-	"github.com/carlosroman/go-chip-8/pkg/state"
-	log "github.com/sirupsen/logrus"
-	"github.com/spf13/cobra"
 	"math/rand"
 	"os"
 	"sync"
 	"time"
+
+	"github.com/carlosroman/go-chip-8/pkg/cpu"
+	"github.com/carlosroman/go-chip-8/pkg/state"
+	log "github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 )
 
 const (

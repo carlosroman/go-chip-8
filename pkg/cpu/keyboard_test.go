@@ -1,11 +1,13 @@
 package cpu
 
 import (
-	"github.com/stretchr/testify/assert"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+
 	"testing"
+
+	log "github.com/sirupsen/logrus"
 )
 
 func init() {

@@ -2,10 +2,11 @@ package cpu
 
 import (
 	"context"
-	log "github.com/sirupsen/logrus"
-	"golang.org/x/time/rate"
 	"sync"
 	"time"
+
+	log "github.com/sirupsen/logrus"
+	"golang.org/x/time/rate"
 )
 
 type timer struct {
