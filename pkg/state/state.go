@@ -62,14 +62,14 @@ func (s *Stack) Pop() (val int16) {
 	s.l.Lock()
 	defer s.l.Unlock()
 	val = s.s[s.i]
-	s.i -= 1
+	s.i--
 	return val
 }
 
 func (s *Stack) Push(val int16) {
 	s.l.Lock()
 	defer s.l.Unlock()
-	s.i += 1
+	s.i++
 	s.s[s.i] = val
 }
 
